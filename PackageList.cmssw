@@ -247,7 +247,7 @@ DQM/SiStripCommissioningClients V07-06-05-02
 DQM/SiStripCommissioningDbClients V09-06-06-02
 DQM/SiStripCommissioningSources V07-09-22-05
 DQM/SiStripCommissioningSummary V05-03-03
-DQM/SiStripCommon V05-01-01
+DQM/SiStripCommon V05-01-02
 DQM/SiStripHistoricInfoClient V04-02-13
 DQM/SiStripMonitorClient V03-06-04
 DQM/SiStripMonitorCluster V05-01-62
@@ -266,7 +266,7 @@ DQMOffline/CalibCalo V00-01-27
 DQMOffline/CalibMuon V00-04-00
 DQMOffline/CalibTracker V00-03-11-04
 DQMOffline/Configuration V00-04-14
-DQMOffline/EGamma V04-03-01
+DQMOffline/EGamma V04-03-02
 DQMOffline/Ecal V00-19-07
 DQMOffline/Hcal V00-00-02
 DQMOffline/JetMET V01-02-91
@@ -276,7 +276,7 @@ DQMOffline/PFTau V00-03-09
 DQMOffline/RecoB V01-03-27
 DQMOffline/Trigger V07-03-04
 DQMServices/ClientConfig V03-07-23
-DQMServices/Components V03-16-33
+DQMServices/Components V03-16-34
 DQMServices/Core V03-15-29
 DQMServices/Diagnostic V04-04-16
 DQMServices/Examples V03-02-06
@@ -435,13 +435,13 @@ FWCore/Catalog V03-01-13
 FWCore/Common V00-04-04
 FWCore/Concurrency V01-00-02
 FWCore/FWLite V00-26-07
-FWCore/Framework V09-09-03
+FWCore/Framework V09-09-04
 FWCore/GuiBrowsers V00-00-70
 FWCore/Integration V01-25-01
 FWCore/MessageLogger V03-20-07
 FWCore/MessageService V01-24-24
 FWCore/Modules V01-19-03
-FWCore/ParameterSet V12-22-06
+FWCore/ParameterSet V12-22-07
 FWCore/PluginManager V01-08-01
 FWCore/PrescaleService V00-07-03
 FWCore/Python V00-01-00
@@ -490,12 +490,12 @@ FastSimulation/Utilities V00-04-09
 FastSimulation/Validation V01-13-05
 Fireworks/Calo V06-13-05-01
 Fireworks/Candidates V06-13-01
-Fireworks/Core V06-16-11
+Fireworks/Core V06-16-15
 Fireworks/Electrons V06-14-03
 Fireworks/Eve V06-13-03
 Fireworks/FWInterface V06-13-11
 Fireworks/GenParticle V06-13-02
-Fireworks/Geometry V06-13-20
+Fireworks/Geometry V06-13-21
 Fireworks/Macros V06-13-00
 Fireworks/Muons V06-13-05
 Fireworks/ParticleFlow V06-13-08
@@ -718,7 +718,7 @@ PhysicsTools/SelectorUtils V00-03-24-01
 PhysicsTools/TagAndProbe V04-00-03-07
 PhysicsTools/UtilAlgos V08-02-16
 PhysicsTools/Utilities V08-03-23
-QCDAnalysis/ChargedHadronSpectra V00-03-09
+QCDAnalysis/ChargedHadronSpectra V00-03-10
 QCDAnalysis/Configuration V00-01-03-01
 QCDAnalysis/Skimming V00-02-14
 QCDAnalysis/UEAnalysis V00-02-01-11
@@ -801,7 +801,7 @@ RecoLocalTracker/Records V01-03-00
 RecoLocalTracker/SiPixelClusterizer V04-00-02
 RecoLocalTracker/SiPixelRecHits V06-01-04
 RecoLocalTracker/SiStripClusterizer V14-05-06
-RecoLocalTracker/SiStripRecHitConverter V06-01-07
+RecoLocalTracker/SiStripRecHitConverter V06-01-08
 RecoLocalTracker/SiStripZeroSuppression V07-06-09
 RecoLocalTracker/SubCollectionProducers V01-10-00
 RecoLuminosity/LumiDB V04-02-03

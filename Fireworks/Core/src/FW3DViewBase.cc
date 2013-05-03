@@ -8,7 +8,7 @@
 //
 // Original Author:  Chris Jones
 //         Created:  Thu Feb 21 11:22:41 EST 2008
-// $Id: FW3DViewBase.cc,v 1.29 2012/04/29 20:54:46 amraktad Exp $
+// $Id: FW3DViewBase.cc,v 1.33 2013/05/01 05:00:09 amraktad Exp $
 //
 #include <boost/bind.hpp>
 
@@ -21,6 +21,7 @@
 #include "TGLPerspectiveCamera.h"
 #include "TEveManager.h"
 #include "TEveElement.h"
+#include "TEveLine.h"
 #include "TEveScene.h"
 #include "TGLLogicalShape.h"
 
@@ -30,6 +31,7 @@
 #include "Fireworks/Core/interface/FWViewContext.h"
 #include "Fireworks/Core/interface/FWViewEnergyScale.h"
 #include "Fireworks/Core/interface/CmsShowViewPopup.h"
+#include "Fireworks/Core/src/FW3DViewDistanceMeasureTool.h"
 
 namespace {
 class TGLClipsiLogical : public TGLLogicalShape
@@ -94,17 +96,15 @@ public:
    }
 };
 }
-//
-// constants, enums and typedefs
-//
 
+////////////////////////////////////////////////////////////////////////////////
+// 
 //
-// static data member definitions
+//                  FW3DViewBase
 //
-//double FW3DViewBase::m_scale = 1;
+// 
 //
-// constructors and destructor
-//
+////////////////////////////////////////////////////////////////////////////////
 FW3DViewBase::FW3DViewBase(TEveWindowSlot* iParent, FWViewType::EType typeId):
    FWEveView(iParent, typeId, 8),
    m_geometry(0),
@@ -117,9 +117,13 @@ FW3DViewBase::FW3DViewBase(TEveWindowSlot* iParent, FWViewType::EType typeId):
    m_showTrackerEndcap(this, "Show Tracker Endcap", false),
    m_rnrStyle(this, "Render Style", 0l, 0l, 2l),
    m_clipParam(this, "View dependent Clip", false),
-   m_selectable(this, "Enable Tooltips", false)
+   m_selectable(this, "Enable Tooltips", false),
+   m_cameraType(this, "Camera Type", 0l, 0l, 5l),
+   m_DMT(0),
+   m_DMTline(0)
 {
    viewerGL()->SetCurrentCamera(TGLViewer::kCameraPerspXOZ);
+   m_DMT = new FW3DViewDistanceMeasureTool();
 
    m_showMuonBarrel.addEntry(0, "Hide");
    m_showMuonBarrel.addEntry(1, "Simplified");
@@ -134,6 +138,15 @@ FW3DViewBase::FW3DViewBase(TEveWindowSlot* iParent, FWViewType::EType typeId):
 
    m_selectable.changed_.connect(boost::bind(&FW3DViewBase::selectable,this, _1));
 
+
+   m_cameraType.addEntry(TGLViewer::kCameraPerspXOZ,"PerspXOZ" );
+   m_cameraType.addEntry(TGLViewer::kCameraOrthoXOY,"OrthoXOY");
+   m_cameraType.addEntry(TGLViewer::kCameraOrthoXOZ,"OrthoXOZ");
+   m_cameraType.addEntry(TGLViewer::kCameraOrthoZOY,"OrthoZOY" );  
+   m_cameraType.addEntry(TGLViewer::kCameraOrthoXnOY,"OrthoXnOY");
+   m_cameraType.addEntry(TGLViewer::kCameraOrthoXnOZ,"OrthoXnOZ");
+   m_cameraType.addEntry(TGLViewer::kCameraOrthoZnOY,"OrthoZnOY" );  
+   m_cameraType.changed_.connect(boost::bind(&FW3DViewBase::setCameraType,this, _1));
 }
 
 FW3DViewBase::~FW3DViewBase()
@@ -158,6 +171,15 @@ void FW3DViewBase::setContext(const fireworks::Context& context)
    TGLClipPlane* c=new TGLClipPlane();
    c->Setup(TGLVector3(1e10,0,0), TGLVector3(-1,0,0));
    eventScene()->GetGLScene()->SetClip(c);
+
+   m_DMTline = new TEveLine();
+   m_DMTline->SetLineColor(1016);
+   m_DMTline->SetLineStyle(5);
+
+
+   m_DMTline->SetPoint(0, 0, 0, 0);
+   m_DMTline->SetPoint(1, 0, 0, 0);
+   eventScene()->AddElement(m_DMTline);
 }
 
 void FW3DViewBase::showMuonBarrel(long x)
@@ -167,6 +189,15 @@ void FW3DViewBase::showMuonBarrel(long x)
       m_geometry->showMuonBarrel(x == 1);
       m_geometry->showMuonBarrelFull(x == 2);
    }
+}
+
+void FW3DViewBase::setCameraType(long x)
+{
+   viewerGL()->RefCamera(TGLViewer::ECameraType(x)).IncTimeStamp();
+   viewerGL()->SetCurrentCamera(TGLViewer::ECameraType(x));
+   
+   //if (viewerGL()->CurrentCamera().IsOrthographic())
+   //   ((TGLOrthoCamera*)(&viewerGL()->CurrentCamera()))->SetEnableRotate(1);
 }
 
 void
@@ -231,6 +262,23 @@ FW3DViewBase::setFrom(const FWConfiguration& iFrom)
    }
 }
 
+bool FW3DViewBase::requestGLHandlerPick() const
+{
+   return m_DMT->m_action != FW3DViewDistanceMeasureTool::kNone;
+}
+
+void FW3DViewBase::setCurrentDMTVertex(double x, double y, double z)
+{
+  if (m_DMT->m_action == FW3DViewDistanceMeasureTool::kNone)
+    printf( "ERROR!!!! FW3DViewBase::setCurrentDMTVertex \n");
+
+   m_DMTline->SetPoint(m_DMT->m_action, x, y, z);
+   m_DMTline->ElementChanged();
+   viewerGL()->RequestDraw();
+
+   m_DMT->refCurrentVertex().Set(x, y,z);
+   m_DMT->resetAction();
+}
 
 void 
 FW3DViewBase::populateController(ViewerParameterGUI& gui) const
@@ -253,6 +301,10 @@ FW3DViewBase::populateController(ViewerParameterGUI& gui) const
    gui.requestTab("Style").separator();
    gui.getTabContainer()->AddFrame(new TGTextButton(gui.getTabContainer(), "Root controls",
                                                     Form("TEveGedEditor::SpawnNewEditor((TGLViewer*)0x%lx)", (unsigned long)viewerGL())));
+
+   gui.requestTab("Tools").addParam(&m_cameraType).separator();
+   gui.getTabContainer()->AddFrame(m_DMT->buildGUI( gui.getTabContainer()), new TGLayoutHints(kLHintsExpandX, 2, 2, 2, 2));
+
 }
 
 
