@@ -55,7 +55,7 @@ namespace edm {
       Event e(ep, moduleDescription_);
       e.setConsumer(this);
       this->produce(e, c);
-      e.commit_(&previousParentage_, &previousParentageId_);
+      commit_(e,&previousParentage_, &previousParentageId_);
       return true;
     }
     

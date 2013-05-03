@@ -32,7 +32,7 @@
 namespace edm {
   namespace one {
 
-    class EDProducerBase
+    class EDProducerBase : public ProducerBase, public EDConsumerBase
     {
       
     public:
@@ -77,7 +77,7 @@ namespace edm {
       void doPostForkReacquireResources(unsigned int iChildIndex, unsigned int iNumberOfChildren);
 
       
-      void registerProductsAndCallbacks(EDProducer* module, ProductRegistry* reg) {
+      void registerProductsAndCallbacks(EDProducerBase* module, ProductRegistry* reg) {
         registerProducts(module, reg, moduleDescription_);
       }
       std::string workerType() const {return "WorkerT<EDProducer>";}
