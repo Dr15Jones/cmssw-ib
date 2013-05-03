@@ -16,6 +16,13 @@ namespace edm {
   class BranchDescription;
   class ModuleDescription;
   class ProductRegistry;
+  
+  class EDProducer;
+  class EDFilter;
+  namespace one {
+    class EDProducerBase;
+  }
+  
   class ProducerBase : private ProductRegistryHelper {
   public:
     typedef ProductRegistryHelper::TypeLabelList TypeLabelList;
@@ -38,6 +45,20 @@ namespace edm {
     }
           
   private:
+    friend class EDProducer;
+    friend class EDFilter;
+    friend class one::EDProducerBase;
+    
+    template< typename P>
+    void commit_(P& iPrincipal) {
+      iPrincipal.commit_();
+    }
+
+    template< typename P, typename L, typename I>
+    void commit_(P& iPrincipal, L* iList, I* iID) {
+      iPrincipal.commit_(iList,iID);
+    }
+
     std::function<void(BranchDescription const&)> callWhenNewProductsRegistered_;
   };
 }
