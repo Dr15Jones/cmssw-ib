@@ -24,7 +24,7 @@ process.load('FastSimulation.Configuration.EventContent_cff')
 process.configurationMetadata = cms.untracked.PSet(
     version = cms.untracked.string('$Revision: 1.3 $'),
     annotation = cms.untracked.string('PYTHIA6-MinBias at 900GeV'),
-    name = cms.untracked.string('$Source: /local/reps/CMSSW/CMSSW/FastSimulation/Configuration/python/PYTHIA6_MinBias_900GeV_cff_py_GEN_FASTSIM.py,v $')
+    name = cms.untracked.string('$Source: /local/reps/CMSSW/CMSSW/FastSimulation/Configuration/python/Attic/PYTHIA6_MinBias_900GeV_cff_py_GEN_FASTSIM.py,v $')
 )
 process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32(100)
