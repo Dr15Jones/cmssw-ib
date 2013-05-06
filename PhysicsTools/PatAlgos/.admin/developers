@@ -2,7 +2,7 @@
 #
 # There are two types of developers:
 # 1) Administrators - entitled to edit all files in the module ,
-#    in particular the .admin directory.  (Including this file) 
+#    in particular the .admin directory.  (Including this file)
 # 2) Regular Developers - entitled to edit all files in the module
 #    except those in the .admin directory.
 #
@@ -72,7 +72,6 @@ yilmaz : Yetkin Yilmaz : yetkin.yilmaz@cern.ch
 edelhoff : Matthias Edelhoff : Matthias.Edelhoff@cern.ch
 henderle : Holger Enderle : holger.enderle@desy.de
 fgolf : Frank Golf : fgolf@cern.ch
-kalavase : Puneeth Kalavase : kalavase@physics.ucsb.edu
 npietsch : Niklas Pietsch : niklas.pietsch@desy.de
 beaudett : Florian Beaudette : Florian.Beaudette@cern.ch
 hinzmann : Andreas Hinzmann : andreas.hinzmann@cern.ch
@@ -90,7 +89,8 @@ janot : Partick Janot : Patrick.Janot@cern.ch
 msegala : Michael Segala : michael.andrew.segala@cern.ch
 mkortela : Matti Kortelainen : matti.kortelainen@cern.ch
 jez : Pavel Jez : pavel.jez@cern.ch
-sakuma: Tai Sakuma : tai.sakuma@cern.ch
+sakuma : Tai Sakuma : tai.sakuma@cern.ch
+gulerk : Guler Karapinar : guler.karapinar@cern.ch
 
 >Administrators
 adamwo : Wolfgang Adam : Wolfgang.Adam@cern.ch

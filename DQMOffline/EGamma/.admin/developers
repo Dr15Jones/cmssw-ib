@@ -41,5 +41,6 @@ nkellams : Nathan Kellams : nkellams@nd.edu
 
 >Administrators
 nancy  :  Nancy Marinelli : marineli@mail.cern.ch
-anderson  :  Mike Anderson   : mbanderson@hep.wisc.edu
-chamont  : David Chamont  :chamont@llr.in2p3.fr
+#anderson  :  Mike Anderson   : mbanderson@hep.wisc.edu
+chamont  : David Chamont  : chamont@llr.in2p3.fr
+gmusat  : Gabriel Musat : musat@llr.in2p3.fr

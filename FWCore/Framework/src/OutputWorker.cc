@@ -1,6 +1,6 @@
 
 /*----------------------------------------------------------------------
-$Id: OutputWorker.cc,v 1.40 2013/02/27 15:21:54 wdd Exp $
+$Id: OutputWorker.cc,v 1.41 2013/05/03 18:35:58 chrjones Exp $
 ----------------------------------------------------------------------*/
 
 #include "FWCore/Framework/interface/OutputModule.h"
@@ -8,10 +8,10 @@ $Id: OutputWorker.cc,v 1.40 2013/02/27 15:21:54 wdd Exp $
 #include "FWCore/Framework/src/OutputWorker.h"
 
 namespace edm {
-  OutputWorker::OutputWorker(std::auto_ptr<OutputModule> mod,
+  OutputWorker::OutputWorker(std::unique_ptr<OutputModule>&& mod,
 			     ModuleDescription const& md,
 			     WorkerParams const& wp):
-      WorkerT<OutputModule>(mod, md, wp)
+  WorkerT<OutputModule>(std::move(mod), md, wp)
   {
   }
 

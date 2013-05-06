@@ -42,10 +42,6 @@ from FastSimulation.Tracking.IterativeTracking_cff import *
 from FastSimulation.CaloRecHitsProducer.CaloRecHits_cff import *
 from RecoLocalCalo.HcalRecAlgos.hcalRecAlgoESProd_cfi import *
 
-if (MixingMode==2):
-#    ecalPreshowerRecHit.RecHitsFactory.ECALPreshower.MixedSimHits = cms.InputTag("mixSimCaloHits","famosSimHitsEcalHitsES") 
-    ecalPreshowerRecHit.RecHitsFactory.ECALPreshower.MixedSimHits = cms.InputTag("mixSimCaloHits","g4SimHitsEcalHitsES")
-
 # ECAL clusters
 from RecoEcal.Configuration.RecoEcal_cff import *
 reducedEcalRecHitsSequence.remove(seldigis)
@@ -416,7 +412,6 @@ if(CaloMode==3):
         PFJetMet+
         ic5JetTracksAssociatorAtVertex+
         ak5JetTracksAssociatorAtVertex+
-        famosTauTaggingSequence+
         reducedRecHits+
         famosBTaggingSequence+
         famosPFTauTaggingSequence
@@ -443,7 +438,6 @@ else:
         PFJetMet+
         ic5JetTracksAssociatorAtVertex+
         ak5JetTracksAssociatorAtVertex+
-        famosTauTaggingSequence+
         reducedRecHits+
         famosBTaggingSequence+
         famosPFTauTaggingSequence
@@ -481,7 +475,6 @@ reconstructionHighLevel = cms.Sequence(
     PFJetMet+
     ic5JetTracksAssociatorAtVertex+
     ak5JetTracksAssociatorAtVertex+
-    famosTauTaggingSequence+
     reducedRecHits+
     famosBTaggingSequence+
     famosPFTauTaggingSequence
@@ -641,14 +634,6 @@ famosWithBTagging = cms.Sequence(
     famosBTaggingSequence
     )
 
-famosWithTauTagging = cms.Sequence(
-    famosWithTracksAndCaloTowers+
-    vertexreco+
-    iterativeCone5CaloJets+
-    ic5JetTracksAssociatorAtVertex+
-    ecalClustersNoPFBox+
-    famosTauTaggingSequence
-)
 
 famosWithPFTauTagging = cms.Sequence(
     famosWithCaloTowersAndParticleFlow+
@@ -690,7 +675,6 @@ reconstructionWithFamosNoTk = cms.Sequence(
     PFJetMet+
     ic5JetTracksAssociatorAtVertex+
     ak5JetTracksAssociatorAtVertex+
-    famosTauTaggingSequence+
     reducedRecHits+
     famosBTaggingSequence+
     famosPFTauTaggingSequence
