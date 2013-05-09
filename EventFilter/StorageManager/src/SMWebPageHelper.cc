@@ -32,9 +32,9 @@ namespace stor
     xdaq::ApplicationDescriptor* appDesc,
     SharedResourcesPtr sharedResources
   ) :
-  WebPageHelper<SMWebPageHelper>(appDesc, "$Name: V08-11-05 $", this, &stor::SMWebPageHelper::addDOMforHyperLinks),
+  WebPageHelper<SMWebPageHelper>(appDesc, "$Name: V08-11-06 $", this, &stor::SMWebPageHelper::addDOMforHyperLinks),
   sharedResources_(sharedResources),
-  consumerWebPageHelper_(appDesc, "$Name: V08-11-05 $", this, &stor::SMWebPageHelper::addDOMforHyperLinks)
+  consumerWebPageHelper_(appDesc, "$Name: V08-11-06 $", this, &stor::SMWebPageHelper::addDOMforHyperLinks)
   {}
 
 

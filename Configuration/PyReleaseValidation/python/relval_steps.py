@@ -255,6 +255,9 @@ steps['Wjet_Pt_3000_3500']=gen('Wjet_Pt_3000_3500_8TeV_cfi',Kby(9,50))
 steps['LM1_sfts']=gen('LM1_sfts_8TeV_cfi',Kby(9,100))
 steps['QCD_FlatPt_15_3000']=gen('QCDForPF_8TeV_cfi',Kby(9,100))
 steps['QCD_FlatPt_15_3000HS']=gen('QCDForPF_8TeV_cfi',Kby(50,100))
+steps['ZpMM_2250_8TeV_Tauola']=gen('ZpMM_2250_8TeV_Tauola_cfi',Kby(9,100))
+steps['ZpEE_2250_8TeV_Tauola']=gen('ZpEE_2250_8TeV_Tauola_cfi',Kby(9,100))
+steps['ZpTT_1500_8TeV_Tauola']=gen('ZpTT_1500_8TeV_Tauola_cfi',Kby(9,100))
 
 def identitySim(wf):
     return merge([{'--restoreRND':'SIM','--process':'SIM2'},wf])
@@ -295,6 +298,11 @@ steps['Wjet_Pt_80_120INPUT']={'INPUT':InputInfo(dataSet='/RelValWjet_Pt_80_120/%
 steps['Wjet_Pt_3000_3500INPUT']={'INPUT':InputInfo(dataSet='/RelValWjet_Pt_3000_3500/%s/GEN-SIM'%(baseDataSetRelease[0],),location='STD')}
 steps['LM1_sftsINPUT']={'INPUT':InputInfo(dataSet='/RelValLM1_sfts/%s/GEN-SIM'%(baseDataSetRelease[0],),location='STD')}
 steps['QCD_FlatPt_15_3000INPUT']={'INPUT':InputInfo(dataSet='/RelValQCD_FlatPt_15_3000/%s/GEN-SIM'%(baseDataSetRelease[0],),location='STD')}
+# this input is dummy, waiting to have the actual GEN-SIM - to be updated
+steps['ZpMM_2250_8TeV_TauolaINPUT']={'INPUT':InputInfo(dataSet='/RelValQCD_FlatPt_15_3000/%s/GEN-SIM'%(baseDataSetRelease[0],),location='STD')}
+steps['ZpEE_2250_8TeV_TauolaINPUT']={'INPUT':InputInfo(dataSet='/RelValQCD_FlatPt_15_3000/%s/GEN-SIM'%(baseDataSetRelease[0],),location='STD')}
+steps['ZpTT_1500_8TeV_TauolaINPUT']={'INPUT':InputInfo(dataSet='/RelValQCD_FlatPt_15_3000/%s/GEN-SIM'%(baseDataSetRelease[0],),location='STD')}
+
 
 steps['QCD_FlatPt_15_3000HSINPUT']={'INPUT':InputInfo(dataSet='/RelValQCD_FlatPt_15_3000/CMSSW_5_2_2-PU_START52_V4_special_120326-v1/GEN-SIM',location='STD')}
 steps['QCD_FlatPt_15_3000HS__DIGIPU1INPUT']={'INPUT':InputInfo(dataSet='/RelValQCD_FlatPt_15_3000/CMSSW_5_2_2-PU_START52_V4_special_120326-v1/GEN-SIM-DIGI-RAW-HLTDEBUG',location='STD')}
@@ -442,6 +450,8 @@ steps['ZMM_UPGPhase1_8']=genepi('ZMM_8TeV_cfi',Kby(18,300))
 steps['ADDMonoJet_d3MD3_UPGPhase1_8']=genepi('ADDMonoJet_8TeV_d3MD3_cfi',Kby(9,100))
 steps['ZpMM_UPGPhase1_8']=genepi('ZpMM_8TeV_cfi',Kby(9,200))
 steps['WpM_UPGPhase1_8']=genepi('WpM_8TeV_cfi',Kby(9,200))
+
+
 
 
 
@@ -757,6 +767,7 @@ steps['TTJets_TuneZ2star_8TeV_madgraph-tauola']=genvalid('Hadronizer_MgmMatchTun
 steps['WJetsLNu_TuneZ2star_8TeV_madgraph-tauola']=genvalid('Hadronizer_MgmMatchTuneZ2star_8TeV_madgraph_tauola_cff',step1GenDefaults,fi=5607)
 steps['ZJetsLNu_TuneZ2star_8TeV_madgraph-tauola']=genvalid('Hadronizer_MgmMatchTuneZ2star_8TeV_madgraph_tauola_cff',step1GenDefaults,fi=5591)
 steps['ZJetsLNu_Tune4C_8TeV_madgraph-pythia8']=genvalid('Hadronizer_MgmMatchTune4C_8TeV_madgraph_pythia8_cff',step1GenDefaults,fi=5591)
+steps['ReggeGribovPartonMC_EposLHC_5TeV_pPb']=genvalid('GeneratorInterface/ReggeGribovPartonMCInterface/ReggeGribovPartonMC_EposLHC_5TeV_pPb_cfi',step1GenDefaults)
 
 PU={'-n':10,'--pileup':'default','--pileup_input':'dbs:/RelValMinBias/%s/GEN-SIM'%(baseDataSetRelease[2],)}
 PUFS={'--pileup':'default'}
