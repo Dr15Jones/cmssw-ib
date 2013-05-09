@@ -42,7 +42,7 @@ namespace edm {
          protected:
             static const std::string kUnknownResource;
             
-            void usesResource(std::string& iName = kUnknownResource);
+            void usesResource(std::string const& iName = kUnknownResource);
          };
          
          template <typename T>
@@ -116,7 +116,8 @@ namespace edm {
             virtual void beginLuminosityBlockProduce(edm::LuminosityBlock&, edm::EventSetup const&) = 0;
          };
          
-         class EndLuminosityBlockProducer : public virtual edm::one::EDProducerBase {
+         template <typename T>
+         class EndLuminosityBlockProducer : public virtual T {
          public:
             EndLuminosityBlockProducer() = default;
             EndLuminosityBlockProducer( EndLuminosityBlockProducer const&) = delete;
