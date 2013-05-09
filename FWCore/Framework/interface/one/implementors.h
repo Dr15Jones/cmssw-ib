@@ -23,7 +23,7 @@
 #include <string>
 
 // user include files
-#include "FWCore/Framework/interface/FrameworkFwd.h"
+#include "FWCore/Framework/interface/Frameworkfwd.h"
 
 // forward declarations
 
