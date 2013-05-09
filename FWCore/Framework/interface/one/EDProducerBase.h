@@ -1,5 +1,5 @@
-#ifndef FWCore_Framework_EDProducerBase_h
-#define FWCore_Framework_EDProducerBase_h
+#ifndef FWCore_Framework_one_EDProducerBase_h
+#define FWCore_Framework_one_EDProducerBase_h
 // -*- C++ -*-
 //
 // Package:     FWCore/Framework
@@ -59,13 +59,13 @@ namespace edm {
       void doBeginJob();
       void doEndJob();
       
-      virtual void doBeginRun(RunPrincipal& rp, EventSetup const& c,
+      void doBeginRun(RunPrincipal& rp, EventSetup const& c,
                       CurrentProcessingContext const* cpc);
-      virtual void doEndRun(RunPrincipal& rp, EventSetup const& c,
+      void doEndRun(RunPrincipal& rp, EventSetup const& c,
                     CurrentProcessingContext const* cpc);
-      virtual void doBeginLuminosityBlock(LuminosityBlockPrincipal& lbp, EventSetup const& c,
+      void doBeginLuminosityBlock(LuminosityBlockPrincipal& lbp, EventSetup const& c,
                                   CurrentProcessingContext const* cpc);
-      virtual void doEndLuminosityBlock(LuminosityBlockPrincipal& lbp, EventSetup const& c,
+      void doEndLuminosityBlock(LuminosityBlockPrincipal& lbp, EventSetup const& c,
                                 CurrentProcessingContext const* cpc);
       
       //For now, the following are just dummy implemenations with no ability for users to override
@@ -86,6 +86,17 @@ namespace edm {
       virtual void beginJob() {}
       virtual void endJob(){}
 
+      virtual void doBeginRun_(Run const& rp, EventSetup const& c);
+      virtual void doEndRun_(Run const& rp, EventSetup const& c);
+      virtual void doBeginLuminosityBlock_(LuminosityBlock const& lbp, EventSetup const& c);
+      virtual void doEndLuminosityBlock_(LuminosityBlock const& lbp, EventSetup const& c);
+
+      virtual void doBeginRunProduce_(Run& rp, EventSetup const& c);
+      virtual void doEndRunProduce_(Run& rp, EventSetup const& c);
+      virtual void doBeginLuminosityBlockProduce_(LuminosityBlock& lbp, EventSetup const& c);
+      virtual void doEndLuminosityBlockProduce_(LuminosityBlock& lbp, EventSetup const& c);
+
+      
       void setModuleDescription(ModuleDescription const& md) {
         moduleDescription_ = md;
       }

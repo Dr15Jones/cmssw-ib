@@ -72,53 +72,50 @@ namespace edm {
     void
     EDProducerBase::doBeginRun(RunPrincipal& rp, EventSetup const& c,
                            CurrentProcessingContext const* cpc) {
-      /*
+      
       detail::CPCSentry sentry(current_context_, cpc);
       Run r(rp, moduleDescription_);
       r.setConsumer(this);
       Run const& cnstR = r;
-      this->beginRun(cnstR, c);
-      r.commit_();
-       */
+      this->doBeginRun_(cnstR, c);
+      this->doBeginRunProduce_(r,c);
+      commit_(r);
     }
     
     void
     EDProducerBase::doEndRun(RunPrincipal& rp, EventSetup const& c,
                          CurrentProcessingContext const* cpc) {
-      /*
       detail::CPCSentry sentry(current_context_, cpc);
       Run r(rp, moduleDescription_);
       r.setConsumer(this);
       Run const& cnstR = r;
-      this->endRun(cnstR, c);
-      r.commit_();
-       */
+      this->doEndRun_(cnstR, c);
+      this->doEndRunProduce_(r, c);
+      commit_(r);
     }
     
     void
     EDProducerBase::doBeginLuminosityBlock(LuminosityBlockPrincipal& lbp, EventSetup const& c,
                                        CurrentProcessingContext const* cpc) {
-      /*
       detail::CPCSentry sentry(current_context_, cpc);
       LuminosityBlock lb(lbp, moduleDescription_);
       lb.setConsumer(this);
       LuminosityBlock const& cnstLb = lb;
-      this->beginLuminosityBlock(cnstLb, c);
-      lb.commit_();
-       */
+      this->doBeginLuminosityBlock_(cnstLb, c);
+      this->doBeginLuminosityBlockProduce_(lb, c);
+      commit_(lb);
     }
     
     void
     EDProducerBase::doEndLuminosityBlock(LuminosityBlockPrincipal& lbp, EventSetup const& c,
                                      CurrentProcessingContext const* cpc) {
-      /*
       detail::CPCSentry sentry(current_context_, cpc);
       LuminosityBlock lb(lbp, moduleDescription_);
       lb.setConsumer(this);
       LuminosityBlock const& cnstLb = lb;
-      this->endLuminosityBlock(cnstLb, c);
-      lb.commit_();
-       */
+      this->doEndLuminosityBlock_(cnstLb, c);
+      this->doEndLuminosityBlockProduce_(lb, c);
+      commit_(lb);
     }
     
     void
@@ -150,6 +147,16 @@ namespace edm {
     EDProducerBase::doPostForkReacquireResources(unsigned int iChildIndex, unsigned int iNumberOfChildren) {
       //postForkReacquireResources(iChildIndex, iNumberOfChildren);
     }
+    
+    void EDProducerBase::doBeginRun_(Run const& rp, EventSetup const& c) {}
+    void EDProducerBase::doEndRun_(Run const& rp, EventSetup const& c) {}
+    void EDProducerBase::doBeginLuminosityBlock_(LuminosityBlock const& lbp, EventSetup const& c) {}
+    void EDProducerBase::doEndLuminosityBlock_(LuminosityBlock const& lbp, EventSetup const& c) {}
+
+    void EDProducerBase::doBeginRunProduce_(Run& rp, EventSetup const& c) {}
+    void EDProducerBase::doEndRunProduce_(Run& rp, EventSetup const& c) {}
+    void EDProducerBase::doBeginLuminosityBlockProduce_(LuminosityBlock& lbp, EventSetup const& c) {}
+    void EDProducerBase::doEndLuminosityBlockProduce_(LuminosityBlock& lbp, EventSetup const& c) {}
     
     CurrentProcessingContext const*
     EDProducerBase::currentContext() const {

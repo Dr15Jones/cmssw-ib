@@ -40,8 +40,8 @@ namespace edm {
       kBeginLuminosityBlockProducer,
       kEndLuminosityBlockProducer,
       kOneSharedResources,
-      kOneRunWatcher,
-      kOneLuminosityBlockWatcher
+      kOneWatchRuns,
+      kOneWatchLuminosityBlocks
     };
     
     namespace AbilityBits {
@@ -55,8 +55,8 @@ namespace edm {
         kBeginRunProducer=64,
         kEndRunProducer=128,
         kOneSharedResources=256,
-        kOneRunWatcher=512,
-        kOneLuminosityBlockWatcher=1024
+        kOneWatchRuns=512,
+        kOneWatchLuminosityBlocks=1024
       };
     }
     
@@ -65,13 +65,13 @@ namespace edm {
         kBeginStream=AbilityBits::kStreamCache,
         kEndStream=AbilityBits::kStreamCache,
         
-        kGlobalBeginRun=AbilityBits::kRunCache|AbilityBits::kRunSummaryCache|AbilityBits::kOneRunWatcher,
-        kGlobalEndRun=AbilityBits::kRunCache|AbilityBits::kRunSummaryCache|AbilityBits::kEndRunProducer|AbilityBits::kOneRunWatcher,
+        kGlobalBeginRun=AbilityBits::kRunCache|AbilityBits::kRunSummaryCache|AbilityBits::kOneWatchRuns,
+        kGlobalEndRun=AbilityBits::kRunCache|AbilityBits::kRunSummaryCache|AbilityBits::kEndRunProducer|AbilityBits::kOneWatchRuns,
         kStreamBeginRun=AbilityBits::kStreamCache,
         kStreamEndRun=AbilityBits::kStreamCache|AbilityBits::kRunSummaryCache,
         
-        kGlobalBeginLuminosityBlock=AbilityBits::kLuminosityBlockCache|AbilityBits::kLuminosityBlockSummaryCache|AbilityBits::kOneLuminosityBlockWatcher,
-        kGlobalEndLuminosityBlock=AbilityBits::kLuminosityBlockCache|AbilityBits::kLuminosityBlockSummaryCache|kOneLuminosityBlockWatcher,
+        kGlobalBeginLuminosityBlock=AbilityBits::kLuminosityBlockCache|AbilityBits::kLuminosityBlockSummaryCache|AbilityBits::kOneWatchLuminosityBlocks,
+        kGlobalEndLuminosityBlock=AbilityBits::kLuminosityBlockCache|AbilityBits::kLuminosityBlockSummaryCache|kOneWatchLuminosityBlocks,
         kStreamBeginLuminosityBlock=AbilityBits::kStreamCache|AbilityBits::kLuminosityBlockSummaryCache,
         kStreamEndLuminosityBlock=AbilityBits::kStreamCache|AbilityBits::kLuminosityBlockSummaryCache
         

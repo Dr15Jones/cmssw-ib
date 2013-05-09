@@ -33,13 +33,13 @@ namespace edm {
       typedef module::Empty Type;
     };
 
-    struct RunWatcher {
-      static constexpr module::Abilities kAbilities=module::Abilities::kRunWatcher;
+    struct WatchRuns {
+      static constexpr module::Abilities kAbilities=module::Abilities::kWatchRuns;
       typedef module::Empty Type;
     };
 
-    struct LuminosityBlockWatcher {
-      static constexpr module::Abilities kAbilities=module::Abilities::kLuminosityBlockWatcher;
+    struct WatchLuminosityBlocks {
+      static constexpr module::Abilities kAbilities=module::Abilities::kWatchLuminosityBlocks;
       typedef module::Empty Type;
     };
   }
