@@ -36,7 +36,7 @@ namespace edm {
     {
       
     public:
-      template <typename T> friend class WorkerT;
+      template <typename T> friend class edm::WorkerT;
       typedef EDProducerBase ModuleType;
       typedef WorkerT<EDProducerBase> WorkerType;
 
