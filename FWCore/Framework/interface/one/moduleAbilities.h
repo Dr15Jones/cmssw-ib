@@ -1,5 +1,5 @@
-#ifndef FWCore_Framework_moduleAbilities_h
-#define FWCore_Framework_moduleAbilities_h
+#ifndef FWCore_Framework_one_moduleAbilities_h
+#define FWCore_Framework_one_moduleAbilities_h
 // -*- C++ -*-
 //
 // Package:     FWCore/Framework
@@ -29,17 +29,17 @@
 namespace edm {
   namespace one {
     struct SharedResources {
-      static constexpr module::Abilities kAbilities=module::Abilities::kSharedResources;
+      static constexpr module::Abilities kAbilities=module::Abilities::kOneSharedResources;
       typedef module::Empty Type;
     };
 
     struct WatchRuns {
-      static constexpr module::Abilities kAbilities=module::Abilities::kWatchRuns;
+      static constexpr module::Abilities kAbilities=module::Abilities::kOneWatchRuns;
       typedef module::Empty Type;
     };
 
     struct WatchLuminosityBlocks {
-      static constexpr module::Abilities kAbilities=module::Abilities::kWatchLuminosityBlocks;
+      static constexpr module::Abilities kAbilities=module::Abilities::kOneWatchLuminosityBlocks;
       typedef module::Empty Type;
     };
   }

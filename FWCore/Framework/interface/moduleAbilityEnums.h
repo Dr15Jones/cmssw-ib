@@ -71,7 +71,7 @@ namespace edm {
         kStreamEndRun=AbilityBits::kStreamCache|AbilityBits::kRunSummaryCache,
         
         kGlobalBeginLuminosityBlock=AbilityBits::kLuminosityBlockCache|AbilityBits::kLuminosityBlockSummaryCache|AbilityBits::kOneWatchLuminosityBlocks,
-        kGlobalEndLuminosityBlock=AbilityBits::kLuminosityBlockCache|AbilityBits::kLuminosityBlockSummaryCache|kOneWatchLuminosityBlocks,
+        kGlobalEndLuminosityBlock=AbilityBits::kLuminosityBlockCache|AbilityBits::kLuminosityBlockSummaryCache|AbilityBits::kOneWatchLuminosityBlocks,
         kStreamBeginLuminosityBlock=AbilityBits::kStreamCache|AbilityBits::kLuminosityBlockSummaryCache,
         kStreamEndLuminosityBlock=AbilityBits::kStreamCache|AbilityBits::kLuminosityBlockSummaryCache
         

@@ -25,7 +25,7 @@
 #include "FWCore/Framework/interface/moduleAbilities.h"
 #include "FWCore/Framework/interface/one/moduleAbilities.h"
 #include "FWCore/Framework/interface/one/implementors.h"
-#include "FWCore/Framework/interface/one/EDProduceBase.h"
+#include "FWCore/Framework/interface/one/EDProducerBase.h"
 
 // forward declarations
 

@@ -104,7 +104,7 @@ namespace edm {
   template<module::Abilities ABILITY>
   struct CheckAbility<ABILITY> {
     static constexpr bool kHasIt=false;
-    typedef Empty Type;
+    typedef edm::module::Empty Type;
   };
 
 }

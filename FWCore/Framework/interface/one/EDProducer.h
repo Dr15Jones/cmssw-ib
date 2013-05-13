@@ -28,12 +28,12 @@
 namespace edm {
   namespace one {
     template< typename... T>
-    class EDProducer : public producerAbilityToImplementor<T>::Type...,
+    class EDProducer : public producer::AbilityToImplementor<T>::Type...,
                        public virtual EDProducerBase {
       
     public:
       EDProducer() = default;
-      virtual ~EDProducer() = default;
+      //virtual ~EDProducer();
       
       // ---------- const member functions ---------------------
       
