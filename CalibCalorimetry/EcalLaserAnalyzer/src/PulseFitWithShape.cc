@@ -1,7 +1,7 @@
 /* 
  *  \class PulseFitWithShape
  *
- *  $Date: 2012/02/09 10:08:09 $
+ *  $Date: 2013/04/19 22:19:23 $
  *  \author: Julie Malcles - CEA/Saclay
  */
 
@@ -35,7 +35,7 @@ PulseFitWithShape::~PulseFitWithShape()
 
 // Initialisation
 
-void PulseFitWithShape::init(int n_samples,int samplb,int sampla,int niter,int n_samplesShape, std::vector<double> shape, double nois)
+void PulseFitWithShape::init(int n_samples,int samplb,int sampla,int niter,int n_samplesShape, const std::vector<double>& shape, double nois)
 {
  
   fNsamples   = n_samples ;
