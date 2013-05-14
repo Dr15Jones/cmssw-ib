@@ -20,6 +20,7 @@
 //
 
 // system include files
+#include "boost/mpl/if.hpp"
 
 // user include files
 #include "FWCore/Framework/interface/moduleAbilityEnums.h"
