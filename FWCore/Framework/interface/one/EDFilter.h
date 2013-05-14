@@ -22,7 +22,7 @@
 // system include files
 
 // user include files
-#include "FWCore/Framework/interface/one/producerAbilityToImplementor.h"
+#include "FWCore/Framework/interface/one/filterAbilityToImplementor.h"
 
 // forward declarations
 namespace edm {
