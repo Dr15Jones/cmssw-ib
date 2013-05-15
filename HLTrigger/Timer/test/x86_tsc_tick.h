@@ -1,23 +1,17 @@
-#if defined(__APPLE__) || defined(__MACH__)
+#if defined __x86_64__ or defined __i386__
+// TSC is only available on x86
 
-#ifndef mach_absolute_time_h
-#define mach_absolute_time_h
+#ifndef x86_tsc_tick_h
+#define x86_tsc_tick_h
 
 // C++ standard headers
 #include <chrono>
-
-// Darwin system headers
-#include <mach/mach.h>
-#include <mach/mach_time.h>
-#define HAVE_MACH_ABSOLUTE_TIME
-
-// for native_duration, etc.
-#include "native.h"
+#include <cmath>
 
 
-// mach_absolute_time ticks as clock period
+// TSC ticks as clock period
 // XXX should it use unsigned integers ?
-struct mach_absolute_time_tick {
+struct tsc_tick {
   static const double  ticks_per_second;
   static const double  seconds_per_tick;
   static const int64_t nanoseconds_per_tick_shifted;
@@ -93,54 +87,9 @@ struct mach_absolute_time_tick {
     int64_t ns = std::chrono::duration_cast<std::chrono::nanoseconds>(d).count();
     return from_nanoseconds(ns);
   }
-
 };
 
 
+#endif // x86_tsc_tick_h
 
-// mach_absolute_time-based clock
-struct mach_absolute_time_clock
-{
-  // std::chrono interface
-  typedef std::chrono::nanoseconds                                              duration;
-  typedef duration::rep                                                         rep;
-  typedef duration::period                                                      period;
-  typedef std::chrono::time_point<mach_absolute_time_clock, duration>           time_point;
-
-  static constexpr bool is_steady    = true;
-  static constexpr bool is_available = true;
-
-  static time_point now() noexcept
-  {
-    uint64_t   ticks  = mach_absolute_time();
-    rep        ns     = mach_absolute_time_tick::to_nanoseconds(ticks);
-    time_point time   = time_point(duration(ns));
-    return time;
-  }
-};
-
-
-// mach_absolute_time-based clock (native)
-struct mach_absolute_time_clock_native
-{
-  // native interface
-  typedef native_duration<uint64_t, mach_absolute_time_tick>                    duration;
-  typedef duration::rep                                                         rep;
-  typedef duration::period                                                      period;
-  typedef std::chrono::time_point<mach_absolute_time_clock_native, duration>    time_point;
-
-  static constexpr bool is_steady    = true;
-  static constexpr bool is_available = true;
-
-  static time_point now() noexcept
-  {
-    rep        ticks = mach_absolute_time();
-    time_point time  = time_point(duration(ticks));
-    return time;
-  }
-
-};
-
-#endif // mach_absolute_time_h
-
-#endif // defined(__APPLE__) || defined(__MACH__)
+#endif // defined __x86_64__ or defined __i386__
