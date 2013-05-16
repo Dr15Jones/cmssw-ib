@@ -14,7 +14,7 @@
 //
 // Original Author:  Kyle Story, Freya Blekman (Cornell University)
 //         Created:  Fri Apr 18 11:58:33 CEST 2008
-// $Id: SignAlgoResolutions.cc,v 1.9 2011/08/15 12:32:03 akhukhun Exp $
+// $Id: SignAlgoResolutions.cc,v 1.11 2013/05/06 17:56:45 sakuma Exp $
 //
 //
 #include "FWCore/Framework/interface/EventSetup.h"
@@ -126,12 +126,9 @@ metsig::SignAlgoResolutions::evalPFJet(const reco::PFJet *jet) const{
 	//use the resolution functions at |eta|=5 to avoid crash for jets with large eta.
 	if(jeta>5) jeta=5;
 	if(jeta<-5) jeta=-5;
-	TF1* fPtEta  = ptResol_->parameterEta("sigma",jeta);
-	TF1* fPhiEta = phiResol_->parameterEta("sigma",jeta);
-	jdeltapt   = jpt>ptResolThreshold_ ? jpt*fPtEta->Eval(jpt)  : jpt*fPtEta->Eval(ptResolThreshold_);
-	jdeltapphi = jpt>ptResolThreshold_ ? jpt*fPhiEta->Eval(jpt) : jpt*fPhiEta->Eval(ptResolThreshold_);
-	delete fPtEta;
-	delete fPhiEta;
+	double jptForEval = jpt>ptResolThreshold_ ? jpt : ptResolThreshold_;
+	jdeltapt   = jpt*ptResol_->parameterEtaEval("sigma",jeta,jptForEval);
+	jdeltapphi = jpt*phiResol_->parameterEtaEval("sigma",jeta,jptForEval);
     }
 
     std::string inputtype = "jet";
