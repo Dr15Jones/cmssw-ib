@@ -1,8 +1,8 @@
-#include "RecoEcal/EgammaClusterProducers/interface/PFECALBoxSuperClusterProducer.h"
+#include "RecoEcal/EgammaClusterProducers/interface/PFECALSuperClusterProducer.h"
 
 #include <memory>
 
-#include "RecoEcal/EgammaClusterAlgos/interface/PFECALBoxSuperClusterAlgo.h"
+#include "RecoEcal/EgammaClusterAlgos/interface/PFECALSuperClusterAlgo.h"
 
 #include "DataFormats/ParticleFlowReco/interface/PFRecHit.h"
 #include "DataFormats/ParticleFlowReco/interface/PFCluster.h"
@@ -18,12 +18,27 @@
 using namespace std;
 using namespace edm;
 
-PFECALBoxSuperClusterProducer::PFECALBoxSuperClusterProducer(const edm::ParameterSet& iConfig)
+namespace {
+  const std::string ClusterType__BOX("Box");
+  const std::string ClusterType__Mustache("Mustache");
+}
+
+PFECALSuperClusterProducer::PFECALSuperClusterProducer(const edm::ParameterSet& iConfig)
 {
     
   verbose_ = 
     iConfig.getUntrackedParameter<bool>("verbose",false);
 
+  std::string _typename = iConfig.getParameter<std::string>("ClusteringType");
+  if( _typename == ClusterType__BOX ) {
+    _theclusteringtype = PFECALSuperClusterAlgo::kBOX;
+  } else if ( _typename == ClusterType__Mustache ) {
+    _theclusteringtype = PFECALSuperClusterAlgo::kMustache;
+  } else {
+    throw cms::Exception("InvalidClusteringType") 
+      << "You have not chosen a valid clustering type," 
+      << " please choose from \"Box\" or \"Mustache\"!";
+  }
   
 
   // parameters for clustering
@@ -48,6 +63,7 @@ PFECALBoxSuperClusterProducer::PFECALBoxSuperClusterProducer(const edm::Paramete
   double doMustacheCut = iConfig.getParameter<bool>("doMustachePUcleaning");
 
   superClusterAlgo_.setVerbosityLevel(verbose_);
+  superClusterAlgo_.setClusteringType(_theclusteringtype);
 
   superClusterAlgo_.setThreshPFClusterSeedBarrel( threshPFClusterSeedBarrel );
   superClusterAlgo_.setThreshPFClusterBarrel( threshPFClusterBarrel );
@@ -68,9 +84,10 @@ PFECALBoxSuperClusterProducer::PFECALBoxSuperClusterProducer(const edm::Paramete
   //superClusterAlgo_.setThreshPFClusterMustacheOutEndcap( threshPFClusterMustacheOutEndcap );
 
   //Load the ECAL energy calibration
-  thePFEnergyCalibration_ = boost::shared_ptr<PFEnergyCalibration>(new PFEnergyCalibration());
-
-
+  thePFEnergyCalibration_ = 
+    std::shared_ptr<PFEnergyCalibration>(new PFEnergyCalibration());
+  superClusterAlgo_.setPFClusterCalibration(thePFEnergyCalibration_);
+  superClusterAlgo_.setUsePS(iConfig.getParameter<bool>("use_preshower"));
 
   bool applyCrackCorrections_ = iConfig.getParameter<bool>("applyCrackCorrections");
   superClusterAlgo_.setCrackCorrections(applyCrackCorrections_);
@@ -89,73 +106,39 @@ PFECALBoxSuperClusterProducer::PFECALBoxSuperClusterProducer(const edm::Paramete
   PFBasicClusterCollectionPreshower_ = iConfig.getParameter<string>("PFBasicClusterCollectionPreshower");
   PFSuperClusterCollectionEndcapWithPreshower_ = iConfig.getParameter<string>("PFSuperClusterCollectionEndcapWithPreshower");
 
-  produces<reco::BasicClusterCollection>(PFBasicClusterCollectionBarrel_);
   produces<reco::SuperClusterCollection>(PFSuperClusterCollectionBarrel_);
-  produces<reco::BasicClusterCollection>(PFBasicClusterCollectionEndcap_);
-  produces<reco::SuperClusterCollection>(PFSuperClusterCollectionEndcap_);
-  //produces<reco::BasicClusterCollection>(PFBasicClusterCollectionPreshower_);
-  produces<reco::SuperClusterCollection>(PFSuperClusterCollectionEndcapWithPreshower_);
-
-   
+  produces<reco::SuperClusterCollection>(PFSuperClusterCollectionEndcapWithPreshower_);   
 }
 
 
 
-PFECALBoxSuperClusterProducer::~PFECALBoxSuperClusterProducer() {}
+PFECALSuperClusterProducer::~PFECALSuperClusterProducer() {}
 
 
 
 
-void PFECALBoxSuperClusterProducer::produce(edm::Event& iEvent, 
+void PFECALSuperClusterProducer::produce(edm::Event& iEvent, 
 				const edm::EventSetup& iSetup) {
   
 
   //Load the pfcluster collections
-  edm::Handle<reco::PFClusterCollection> pfclustersHandle;
+  edm::Handle<edm::View<reco::PFCluster> > pfclustersHandle;
   iEvent.getByLabel( inputTagPFClusters_, pfclustersHandle );  
 
-  edm::Handle<reco::PFClusterCollection> preshowerpfclustersHandle;
+  edm::Handle<edm::View<reco::PFCluster> > preshowerpfclustersHandle;
   iEvent.getByLabel( inputTagPFClustersES_,  preshowerpfclustersHandle);
 
 
-  // do BARREL clustering 
+  // do clustering
+  superClusterAlgo_.loadAndSortPFClusters(*pfclustersHandle,
+					  *preshowerpfclustersHandle);
+  superClusterAlgo_.run();
 
-  std::auto_ptr< reco::BasicClusterCollection >outBasicClustersBarrel (new reco::BasicClusterCollection);
-  superClusterAlgo_.doClustering( pfclustersHandle, outBasicClustersBarrel, thePFEnergyCalibration_ , 0 );
-  //cout << "doBarrelClustering done"<<endl; 
-
-  const edm::OrphanHandle<reco::BasicClusterCollection> bcRefProdBarrel = iEvent.put(outBasicClustersBarrel,PFBasicClusterCollectionBarrel_);
-  //cout << "outBasicClusters are put in the event" << endl;
-
-  auto_ptr< reco::SuperClusterCollection > outSuperClustersBarrel(new reco::SuperClusterCollection);
-  superClusterAlgo_.storeSuperClusters( bcRefProdBarrel, outSuperClustersBarrel );
-  
-  const edm::OrphanHandle<reco::SuperClusterCollection> scRefProdBarrel = iEvent.put(outSuperClustersBarrel, PFSuperClusterCollectionBarrel_);
-  //cout << "outSuperClusters are put in the event" << endl;
-
-
-  //do ENDCAP clustering
-
-  std::auto_ptr< reco::BasicClusterCollection >outBasicClustersEndcap (new reco::BasicClusterCollection);
-  superClusterAlgo_.doClustering( pfclustersHandle, outBasicClustersEndcap, thePFEnergyCalibration_ , 1);
-  //cout << "doBarrelClustering done"<<endl;
-
-  const edm::OrphanHandle<reco::BasicClusterCollection> bcRefProdEndcap = iEvent.put(outBasicClustersEndcap,PFBasicClusterCollectionEndcap_);
-  //cout << "outBasicClusters are put in the event" << endl;
-
-  auto_ptr< reco::SuperClusterCollection > outSuperClustersEndcap(new reco::SuperClusterCollection);
-  superClusterAlgo_.storeSuperClusters( bcRefProdEndcap, outSuperClustersEndcap );
-  
-  const edm::OrphanHandle<reco::SuperClusterCollection> scRefProdEndcap = iEvent.put(outSuperClustersEndcap, PFSuperClusterCollectionEndcap_);
-  //cout << "outSuperClusters are put in the event" << endl;
-
-  
-  auto_ptr< reco::SuperClusterCollection > outSuperClustersEndcapWithPreshower(new reco::SuperClusterCollection);
-  superClusterAlgo_.matchSCtoESclusters(preshowerpfclustersHandle, outSuperClustersEndcapWithPreshower, thePFEnergyCalibration_, 1);
- 
-  const edm::OrphanHandle<reco::SuperClusterCollection> scRefProdEndcapWithPreshower = iEvent.put(outSuperClustersEndcapWithPreshower, PFSuperClusterCollectionEndcapWithPreshower_);
-
-
+  //store in the event
+  iEvent.put(superClusterAlgo_.getEBOutputSCCollection(),
+	     PFSuperClusterCollectionBarrel_);
+  iEvent.put(superClusterAlgo_.getEEOutputSCCollection(), 
+	     PFSuperClusterCollectionEndcapWithPreshower_);
 }
   
 

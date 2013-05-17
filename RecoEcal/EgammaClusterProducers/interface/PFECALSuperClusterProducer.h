@@ -1,5 +1,5 @@
-#ifndef RecoEcal_EgammaClusterProducers_PFECALBoxSuperClusterProducer_h_
-#define RecoEcal_EgammaClusterProducers_PFECALBoxSuperClusterProducer_h_
+#ifndef RecoEcal_EgammaClusterProducers_PFECALSuperClusterProducer_h_
+#define RecoEcal_EgammaClusterProducers_PFECALSuperClusterProducer_h_
 
 // system include files
 #include <memory>
@@ -17,11 +17,12 @@
 #include "DataFormats/ParticleFlowReco/interface/PFRecHitFwd.h"
 #include "DataFormats/ParticleFlowReco/interface/PFClusterFwd.h"
 
-#include "RecoEcal/EgammaClusterAlgos/interface/PFECALBoxSuperClusterAlgo.h"
+#include "RecoEcal/EgammaClusterAlgos/interface/PFECALSuperClusterAlgo.h"
 
-/**\class PFECALBoxSuperClusterProducer 
+/**\class PFECALSuperClusterProducer 
 
 \author Nicolas Chanon
+Additional authors for Mustache: Y. Gershtein, R. Patel, L. Gray
 \date   July 2012
 */
 
@@ -30,10 +31,10 @@ class CaloSubdetectorGeometry;
 class DetId;
 
 
-class PFECALBoxSuperClusterProducer : public edm::EDProducer {
+class PFECALSuperClusterProducer : public edm::EDProducer {
  public:
-  explicit PFECALBoxSuperClusterProducer(const edm::ParameterSet&);
-  ~PFECALBoxSuperClusterProducer();
+  explicit PFECALSuperClusterProducer(const edm::ParameterSet&);
+  ~PFECALSuperClusterProducer();
 
   
   virtual void produce(edm::Event&, const edm::EventSetup&);
@@ -44,8 +45,10 @@ class PFECALBoxSuperClusterProducer : public edm::EDProducer {
   // ----------member data ---------------------------
 
   /// clustering algorithm 
-  PFECALBoxSuperClusterAlgo               superClusterAlgo_;
-  boost::shared_ptr<PFEnergyCalibration> thePFEnergyCalibration_;
+  PFECALSuperClusterAlgo                  superClusterAlgo_;
+  PFECALSuperClusterAlgo::clustering_type _theclusteringtype;
+
+  std::shared_ptr<PFEnergyCalibration> thePFEnergyCalibration_;
 
   /// verbose ?
   bool   verbose_;

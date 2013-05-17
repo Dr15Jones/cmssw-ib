@@ -23,6 +23,7 @@
 # and administrators. Add the email address after the name (seperated by a :)
 # of developers to include in the list.
 #
+
 >Developers
 askew : Andrew Askew : askew@fnal.gov
 tsirig : Dimitrios Tsirigkas: Dimitrios.Tsirigkas@cern.ch
@@ -38,6 +39,7 @@ malberti : Martina Malberti : Martina.Malberti@cern.ch
 arun : Arun Kumar : Arun.Kumar@cern.ch
 cmkuo:  Chia-Ming Kuo :  Chia-Ming.Kuo@cern.ch
 sharper : Sam Harper : sam.james.harper@cern.ch
+lgray : Lindsey.Gray : Lindsey.Gray@cern.ch 
 chanon : Nicolas Chanon : nicolas.pierre.chanon@cern.ch
 
 >Administrators
