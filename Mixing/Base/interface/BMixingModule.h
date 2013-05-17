@@ -72,6 +72,7 @@ namespace edm {
 
   protected:
       void dropUnwantedBranches(std::vector<std::string> const& wantedBranches);
+      virtual void beginJob();
       virtual void endJob();
       //      std::string type_;
       int bunchSpace_;

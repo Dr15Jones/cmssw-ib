@@ -53,8 +53,6 @@ namespace edm
       /**Default destructor*/
       virtual ~DataMixingModule();
 
-      virtual void beginJob() {}
-
       // copies, with EventSetup
       virtual void checkSignal(const edm::Event &e) {}
       virtual void createnewEDProduct() {}

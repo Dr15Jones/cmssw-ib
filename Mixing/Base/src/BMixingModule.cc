@@ -250,6 +250,12 @@ namespace edm {
     }
   }
 
+  void BMixingModule::beginJob() {
+    for (size_t endIdx=0; endIdx<maxNbSources_; endIdx++ ) {
+      if( inputSources_[endIdx] ) inputSources_[endIdx]->beginJob();
+    }
+  }
+
   void BMixingModule::endJob() {
     for (size_t endIdx=0; endIdx<maxNbSources_; endIdx++ ) {
       if( inputSources_[endIdx] ) inputSources_[endIdx]->endJob();

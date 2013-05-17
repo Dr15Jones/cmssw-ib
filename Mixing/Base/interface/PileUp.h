@@ -4,7 +4,7 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include <boost/bind.hpp>
+//#include <boost/bind.hpp>
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Sources/interface/VectorInputSource.h"
 #include "DataFormats/Provenance/interface/EventID.h"
@@ -13,6 +13,8 @@
 
 #include "CLHEP/Random/RandPoissonQ.h"
 #include "CLHEP/Random/RandFlat.h"
+
+#include "boost/shared_ptr.hpp"
 
 #include "TRandom.h"
 #include "TFile.h"
@@ -29,6 +31,8 @@ namespace CLHEP {
 
 
 namespace edm {
+  class XXX;
+
   class PileUp {
   public:
     explicit PileUp(ParameterSet const& pset, double averageNumber, TH1F* const histo, const bool playback);
@@ -46,9 +50,8 @@ namespace edm {
     void dropUnwantedBranches(std::vector<std::string> const& wantedBranches) {
       input_->dropUnwantedBranches(wantedBranches);
     }
-    void endJob () {
-      input_->doEndJob();
-    }
+    void beginJob();
+    void endJob();
 
     void reload(const edm::EventSetup & setup);
 
@@ -84,8 +87,9 @@ namespace edm {
 
     std::unique_ptr<ProductRegistry> productRegistry_;
     std::unique_ptr<VectorInputSource> const input_;
-    std::unique_ptr<ProcessConfiguration> processConfiguration_;
+    boost::shared_ptr<ProcessConfiguration> processConfiguration_;
     std::unique_ptr<EventPrincipal> eventPrincipal_;
+    std::unique_ptr<XXX> provider_;
     std::unique_ptr<CLHEP::RandPoissonQ> poissonDistribution_;
     std::unique_ptr<CLHEP::RandPoisson>  poissonDistr_OOT_;
 

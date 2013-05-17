@@ -17,6 +17,7 @@
 
 #include "FWCore/Framework/interface/ESHandle.h"
 #include "FWCore/Framework/interface/EventSetup.h"
+#include "FWCore/Framework/src/XXX.h"
 #include "CondFormats/DataRecord/interface/MixingRcd.h"
 #include "CondFormats/RunInfo/interface/MixingModuleConfig.h"
 
@@ -45,6 +46,7 @@ namespace edm {
                                                                    )).release()),
     processConfiguration_(new ProcessConfiguration(std::string("@MIXING"), getReleaseVersion(), getPassID())),
     eventPrincipal_(),
+    provider_(),
     poissonDistribution_(),
     poissonDistr_OOT_(),
     playback_(playback),
@@ -64,6 +66,11 @@ namespace edm {
                                        input_->branchIDListHelper(),
                                        *processConfiguration_,
                                        nullptr));
+
+    if(pset.existsAs<ParameterSet>("producers", true)) {
+      ParameterSet producers = pset.getParameter<ParameterSet>("producers");
+      provider_.reset(new XXX(producers, *productRegistry_, ActionTable(), processConfiguration_));
+    }
 
     if (pset.exists("nbPileupEvents")) {
        seed_=pset.getParameter<edm::ParameterSet>("nbPileupEvents").getUntrackedParameter<int>("seed",0);
@@ -146,6 +153,19 @@ namespace edm {
     }
     }
     
+  }
+  void PileUp::beginJob () {
+    input_->doBeginJob();
+    if (provider_.get() != nullptr) {
+      provider_->beginJob(*productRegistry_);
+    }
+  }
+
+  void PileUp::endJob () {
+    if (provider_.get() != nullptr) {
+      provider_->endJob();
+    }
+    input_->doEndJob();
   }
 
   void PileUp::reload(const edm::EventSetup & setup){
