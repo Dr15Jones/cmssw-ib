@@ -46,8 +46,8 @@ namespace edm {
       virtual void beginRun(const edm::Run& r, const edm::EventSetup& setup) override;
       virtual void beginLuminosityBlock(const edm::LuminosityBlock& l, const edm::EventSetup& setup) override;
 
-      virtual void endRun(const edm::Run& r, const edm::EventSetup& setup) override {}
-      virtual void endLuminosityBlock(const edm::LuminosityBlock& l, const edm::EventSetup& setup) override {}
+      virtual void endRun(const edm::Run& r, const edm::EventSetup& setup) override;
+      virtual void endLuminosityBlock(const edm::LuminosityBlock& l, const edm::EventSetup& setup) override;
 
       // to be overloaded by dependent class
       virtual void reload(const edm::EventSetup & setup){};
@@ -72,8 +72,8 @@ namespace edm {
 
   protected:
       void dropUnwantedBranches(std::vector<std::string> const& wantedBranches);
-      virtual void beginJob();
-      virtual void endJob();
+      virtual void beginJob() override;
+      virtual void endJob() override;
       //      std::string type_;
       int bunchSpace_;
       static int vertexoffset;

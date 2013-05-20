@@ -53,6 +53,13 @@ namespace edm {
     void beginJob();
     void endJob();
 
+    void beginRun(const edm::Run& r, const edm::EventSetup& setup);
+    void beginLuminosityBlock(const edm::LuminosityBlock& l, const edm::EventSetup& setup);
+
+    void endRun(const edm::Run& r, const edm::EventSetup& setup);
+    void endLuminosityBlock(const edm::LuminosityBlock& l, const edm::EventSetup& setup);
+
+
     void reload(const edm::EventSetup & setup);
 
     void CalculatePileup(int MinBunch, int MaxBunch, std::vector<int>& PileupSelection, std::vector<float>& TrueNumInteractions);

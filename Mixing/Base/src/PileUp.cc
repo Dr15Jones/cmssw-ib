@@ -168,6 +168,16 @@ namespace edm {
     input_->doEndJob();
   }
 
+  void PileUp::beginRun(const edm::Run& r, const edm::EventSetup& setup) {
+  }
+  void PileUp::beginLuminosityBlock(const edm::LuminosityBlock& l, const edm::EventSetup& setup) {
+  }
+
+  void PileUp::endRun(const edm::Run& r, const edm::EventSetup& setup) {
+  }
+  void PileUp::endLuminosityBlock(const edm::LuminosityBlock& l, const edm::EventSetup& setup) {
+  }
+
   void PileUp::reload(const edm::EventSetup & setup){
     //get the required parameters from DB.
     edm::ESHandle<MixingModuleConfig> configM;

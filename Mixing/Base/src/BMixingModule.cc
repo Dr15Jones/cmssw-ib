@@ -200,13 +200,31 @@ namespace edm {
   // Virtual destructor needed.
   BMixingModule::~BMixingModule() {;}
 
-  // method call at begin run/lumi to reload the mixing configuration
-  void BMixingModule::beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const& setup){
+  // update method call at begin run/lumi to reload the mixing configuration
+  void BMixingModule::beginLuminosityBlock(edm::LuminosityBlock const& lb, edm::EventSetup const& setup){
     update(setup);
+    for (size_t endIdx=0; endIdx<maxNbSources_; ++endIdx) {
+      if(inputSources_[endIdx]) inputSources_[endIdx]->beginLuminosityBlock(lb, setup);
+    }
   }
 
   void BMixingModule::beginRun(edm::Run const& r, edm::EventSetup const& setup){
     update(setup);
+    for (size_t endIdx=0; endIdx<maxNbSources_; ++endIdx) {
+      if(inputSources_[endIdx]) inputSources_[endIdx]->beginRun(r, setup);
+    }
+  }
+
+  void BMixingModule::endLuminosityBlock(edm::LuminosityBlock const& lb, edm::EventSetup const& setup){
+    for (size_t endIdx=0; endIdx<maxNbSources_; ++endIdx) {
+      if(inputSources_[endIdx]) inputSources_[endIdx]->endLuminosityBlock(lb, setup);
+    }
+  }
+
+  void BMixingModule::endRun(edm::Run const& r, edm::EventSetup const& setup){
+    for (size_t endIdx=0; endIdx<maxNbSources_; ++endIdx) {
+      if(inputSources_[endIdx]) inputSources_[endIdx]->endRun(r, setup);
+    }
   }
 
   void BMixingModule::update(const edm::EventSetup & setup){
@@ -251,14 +269,14 @@ namespace edm {
   }
 
   void BMixingModule::beginJob() {
-    for (size_t endIdx=0; endIdx<maxNbSources_; endIdx++ ) {
-      if( inputSources_[endIdx] ) inputSources_[endIdx]->beginJob();
+    for (size_t endIdx=0; endIdx<maxNbSources_; ++endIdx) {
+      if(inputSources_[endIdx]) inputSources_[endIdx]->beginJob();
     }
   }
 
   void BMixingModule::endJob() {
-    for (size_t endIdx=0; endIdx<maxNbSources_; endIdx++ ) {
-      if( inputSources_[endIdx] ) inputSources_[endIdx]->endJob();
+    for (size_t endIdx=0; endIdx<maxNbSources_; ++endIdx) {
+      if(inputSources_[endIdx]) inputSources_[endIdx]->endJob();
     }
   }
 
