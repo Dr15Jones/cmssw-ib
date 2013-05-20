@@ -60,11 +60,11 @@ namespace edm {
     void beginJob(ProductRegistry const& iRegistry);
     void endJob();
 
-    void beginRun(const edm::Run& run, const edm::EventSetup& setup);
-    void beginLuminosityBlock(const edm::LuminosityBlock& lumi, const edm::EventSetup& setup);
+    void beginRun(edm::RunPrincipal& run, const edm::EventSetup& setup);
+    void beginLuminosityBlock(edm::LuminosityBlockPrincipal& lumi, const edm::EventSetup& setup);
 
-    void endRun(const edm::Run& run, const edm::EventSetup& setup);
-    void endLuminosityBlock(const edm::LuminosityBlock& lumi, const edm::EventSetup& setup);
+    void endRun(edm::RunPrincipal& run, const edm::EventSetup& setup);
+    void endLuminosityBlock(edm::LuminosityBlockPrincipal& lumi, const edm::EventSetup& setup);
 
   private:
 
@@ -87,7 +87,6 @@ namespace edm {
     void resetAll();
 
     void setupOnDemandSystem(EventPrincipal& principal, EventSetup const& es);
-
 
     void addToAllWorkers(Worker* w);
     

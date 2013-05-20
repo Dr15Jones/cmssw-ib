@@ -46,6 +46,8 @@ namespace edm {
                                                                    )).release()),
     processConfiguration_(new ProcessConfiguration(std::string("@MIXING"), getReleaseVersion(), getPassID())),
     eventPrincipal_(),
+    lumiPrincipal_(),
+    runPrincipal_(),
     provider_(),
     poissonDistribution_(),
     poissonDistr_OOT_(),
@@ -170,23 +172,27 @@ namespace edm {
 
   void PileUp::beginRun(const edm::Run& run, const edm::EventSetup& setup) {
     if (provider_.get() != nullptr) {
-      provider_->beginRun(run, setup);
+      boost::shared_ptr<RunAuxiliary> aux(new RunAuxiliary(run.runAuxiliary()));
+      runPrincipal_.reset(new RunPrincipal(aux, productRegistry_, *processConfiguration_, nullptr));
+      provider_->beginRun(*runPrincipal_, setup);
     }
   }
   void PileUp::beginLuminosityBlock(const edm::LuminosityBlock& lumi, const edm::EventSetup& setup) {
     if (provider_.get() != nullptr) {
-      provider_->beginLuminosityBlock(lumi, setup);
+      boost::shared_ptr<LuminosityBlockAuxiliary> aux(new LuminosityBlockAuxiliary(lumi.luminosityBlockAuxiliary()));
+      lumiPrincipal_.reset(new LuminosityBlockPrincipal(aux, productRegistry_, *processConfiguration_, nullptr));
+      provider_->beginLuminosityBlock(*lumiPrincipal_, setup);
     }
   }
 
   void PileUp::endRun(const edm::Run& run, const edm::EventSetup& setup) {
     if (provider_.get() != nullptr) {
-      provider_->endRun(run, setup);
+      provider_->endRun(*runPrincipal_, setup);
     }
   }
   void PileUp::endLuminosityBlock(const edm::LuminosityBlock& lumi, const edm::EventSetup& setup) {
     if (provider_.get() != nullptr) {
-      provider_->endLuminosityBlock(lumi, setup);
+      provider_->endLuminosityBlock(*lumiPrincipal_, setup);
     }
   }
 

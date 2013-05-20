@@ -92,10 +92,12 @@ namespace edm {
     int  intFixed_OOT_;
     int  intFixed_ITPU_;
 
-    std::unique_ptr<ProductRegistry> productRegistry_;
+    boost::shared_ptr<ProductRegistry> productRegistry_;
     std::unique_ptr<VectorInputSource> const input_;
     boost::shared_ptr<ProcessConfiguration> processConfiguration_;
     std::unique_ptr<EventPrincipal> eventPrincipal_;
+    std::unique_ptr<LuminosityBlockPrincipal> lumiPrincipal_;
+    std::unique_ptr<RunPrincipal> runPrincipal_;
     std::unique_ptr<XXX> provider_;
     std::unique_ptr<CLHEP::RandPoissonQ> poissonDistribution_;
     std::unique_ptr<CLHEP::RandPoisson>  poissonDistr_OOT_;
