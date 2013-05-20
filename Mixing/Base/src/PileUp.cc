@@ -196,6 +196,13 @@ namespace edm {
     }
   }
 
+  void PileUp::setupPileUpEvent(const edm::EventSetup& setup) {
+    // QQQ note:  run and lumi numbers must be modified to match runPrincipal_ and lumiPrincipal_
+    if (provider_.get() != nullptr) {
+      provider_->setupPileUpEvent(*eventPrincipal_, setup);
+    }
+  }
+
   void PileUp::reload(const edm::EventSetup & setup){
     //get the required parameters from DB.
     edm::ESHandle<MixingModuleConfig> configM;

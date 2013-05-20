@@ -143,20 +143,24 @@ namespace edm {
     }
   }
 
-  void XXX::beginRun(edm::RunPrincipal& run, const edm::EventSetup& setup) {
+  void XXX::beginRun(RunPrincipal& run, const EventSetup& setup) {
     processOneOccurrence<OccurrenceTraits<RunPrincipal, BranchActionBegin> >(run, setup);
   }
 
-  void XXX::beginLuminosityBlock(edm::LuminosityBlockPrincipal& lumi, const edm::EventSetup& setup) {
+  void XXX::beginLuminosityBlock(LuminosityBlockPrincipal& lumi, const EventSetup& setup) {
     processOneOccurrence<OccurrenceTraits<LuminosityBlockPrincipal, BranchActionBegin> >(lumi, setup);
   }
 
-  void XXX::endRun(edm::RunPrincipal& run, const edm::EventSetup& setup) {
+  void XXX::endRun(RunPrincipal& run, const EventSetup& setup) {
     processOneOccurrence<OccurrenceTraits<RunPrincipal, BranchActionEnd> >(run, setup);
   }
 
-  void XXX::endLuminosityBlock(edm::LuminosityBlockPrincipal& lumi, const edm::EventSetup& setup) {
+  void XXX::endLuminosityBlock(LuminosityBlockPrincipal& lumi, const EventSetup& setup) {
     processOneOccurrence<OccurrenceTraits<LuminosityBlockPrincipal, BranchActionEnd> >(lumi, setup);
+  }
+
+  void XXX::setupPileUpEvent(EventPrincipal& ep, const EventSetup& setup) {
+    processOneOccurrence<OccurrenceTraits<EventPrincipal, BranchActionBegin> >(ep, setup);
   }
 
   void XXX::beginJob(ProductRegistry const& iRegistry) {

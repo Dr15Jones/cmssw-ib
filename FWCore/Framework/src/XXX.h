@@ -60,11 +60,13 @@ namespace edm {
     void beginJob(ProductRegistry const& iRegistry);
     void endJob();
 
-    void beginRun(edm::RunPrincipal& run, const edm::EventSetup& setup);
-    void beginLuminosityBlock(edm::LuminosityBlockPrincipal& lumi, const edm::EventSetup& setup);
+    void beginRun(RunPrincipal& run, const edm::EventSetup& setup);
+    void beginLuminosityBlock(LuminosityBlockPrincipal& lumi, const edm::EventSetup& setup);
 
-    void endRun(edm::RunPrincipal& run, const edm::EventSetup& setup);
-    void endLuminosityBlock(edm::LuminosityBlockPrincipal& lumi, const edm::EventSetup& setup);
+    void endRun(RunPrincipal& run, const edm::EventSetup& setup);
+    void endLuminosityBlock(LuminosityBlockPrincipal& lumi, const edm::EventSetup& setup);
+
+    void setupPileUpEvent(EventPrincipal& ep, const EventSetup& setup);
 
   private:
 
@@ -120,7 +122,7 @@ namespace edm {
           assert (action != actions::IgnoreCompletely);
           assert (action != actions::FailPath);
           if (action == actions::SkipEvent) {
-            edm::printCmsExceptionWarning("SkipEvent", e);
+            printCmsExceptionWarning("SkipEvent", e);
           } else {
             throw;
           }

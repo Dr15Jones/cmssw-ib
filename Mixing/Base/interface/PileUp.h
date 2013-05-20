@@ -59,6 +59,7 @@ namespace edm {
     void endRun(const edm::Run& run, const edm::EventSetup& setup);
     void endLuminosityBlock(const edm::LuminosityBlock& lumi, const edm::EventSetup& setup);
 
+    void setupPileUpEvent(const edm::EventSetup& setup);
 
     void reload(const edm::EventSetup & setup);
 

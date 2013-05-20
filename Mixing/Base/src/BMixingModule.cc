@@ -261,9 +261,15 @@ namespace edm {
     put(e,setup);
   }
 
+  void BMixingModule::setupPileUpEvent(const edm::EventSetup& setup) {
+    for (size_t dropIdx=0; dropIdx<maxNbSources_; ++dropIdx) {
+      if(inputSources_[dropIdx]) inputSources_[dropIdx]->setupPileUpEvent(setup);
+    }
+  }
+
   void BMixingModule::dropUnwantedBranches(std::vector<std::string> const& wantedBranches) {
-    for (size_t dropIdx=0; dropIdx<maxNbSources_; dropIdx++ ) {
-      if( inputSources_[dropIdx] ) inputSources_[dropIdx]->dropUnwantedBranches(wantedBranches);
+    for (size_t dropIdx=0; dropIdx<maxNbSources_; ++dropIdx) {
+      if(inputSources_[dropIdx]) inputSources_[dropIdx]->dropUnwantedBranches(wantedBranches);
     }
   }
 
