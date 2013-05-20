@@ -143,14 +143,14 @@ namespace edm {
     }
   }
 
-  void XXX::beginRun(const edm::EventSetup& setup) {
+  void XXX::beginRun(const edm::Run& run, const edm::EventSetup& setup) {
   }
-  void XXX::beginLuminosityBlock(const edm::EventSetup& setup) {
+  void XXX::beginLuminosityBlock(const edm::LuminosityBlock& lumi, const edm::EventSetup& setup) {
   }
 
-  void XXX::endRun(const edm::EventSetup& setup) {
+  void XXX::endRun(const edm::Run& run, const edm::EventSetup& setup) {
   }
-  void XXX::endLuminosityBlock(const edm::EventSetup& setup) {
+  void XXX::endLuminosityBlock(const edm::LuminosityBlock& lumi, const edm::EventSetup& setup) {
   }
 
   void XXX::beginJob(ProductRegistry const& iRegistry) {

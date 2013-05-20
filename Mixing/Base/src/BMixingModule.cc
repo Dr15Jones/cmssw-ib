@@ -201,29 +201,29 @@ namespace edm {
   BMixingModule::~BMixingModule() {;}
 
   // update method call at begin run/lumi to reload the mixing configuration
-  void BMixingModule::beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const& setup){
+  void BMixingModule::beginLuminosityBlock(edm::LuminosityBlock const& lumi, edm::EventSetup const& setup){
     update(setup);
     for (size_t endIdx=0; endIdx<maxNbSources_; ++endIdx) {
-      if(inputSources_[endIdx]) inputSources_[endIdx]->beginLuminosityBlock(setup);
+      if(inputSources_[endIdx]) inputSources_[endIdx]->beginLuminosityBlock(lumi, setup);
     }
   }
 
-  void BMixingModule::beginRun(edm::Run const&, edm::EventSetup const& setup){
+  void BMixingModule::beginRun(edm::Run const& run, edm::EventSetup const& setup){
     update(setup);
     for (size_t endIdx=0; endIdx<maxNbSources_; ++endIdx) {
-      if(inputSources_[endIdx]) inputSources_[endIdx]->beginRun(setup);
+      if(inputSources_[endIdx]) inputSources_[endIdx]->beginRun(run, setup);
     }
   }
 
-  void BMixingModule::endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const& setup){
+  void BMixingModule::endLuminosityBlock(edm::LuminosityBlock const& lumi, edm::EventSetup const& setup){
     for (size_t endIdx=0; endIdx<maxNbSources_; ++endIdx) {
-      if(inputSources_[endIdx]) inputSources_[endIdx]->endLuminosityBlock(setup);
+      if(inputSources_[endIdx]) inputSources_[endIdx]->endLuminosityBlock(lumi, setup);
     }
   }
 
-  void BMixingModule::endRun(edm::Run const&, edm::EventSetup const& setup){
+  void BMixingModule::endRun(edm::Run const& run, edm::EventSetup const& setup){
     for (size_t endIdx=0; endIdx<maxNbSources_; ++endIdx) {
-      if(inputSources_[endIdx]) inputSources_[endIdx]->endRun(setup);
+      if(inputSources_[endIdx]) inputSources_[endIdx]->endRun(run, setup);
     }
   }
 
