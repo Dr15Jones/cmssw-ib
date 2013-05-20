@@ -168,14 +168,26 @@ namespace edm {
     input_->doEndJob();
   }
 
-  void PileUp::beginRun(const edm::Run& r, const edm::EventSetup& setup) {
+  void PileUp::beginRun(const edm::EventSetup& setup) {
+    if (provider_.get() != nullptr) {
+      provider_->beginRun(setup);
+    }
   }
-  void PileUp::beginLuminosityBlock(const edm::LuminosityBlock& l, const edm::EventSetup& setup) {
+  void PileUp::beginLuminosityBlock(const edm::EventSetup& setup) {
+    if (provider_.get() != nullptr) {
+      provider_->beginLuminosityBlock(setup);
+    }
   }
 
-  void PileUp::endRun(const edm::Run& r, const edm::EventSetup& setup) {
+  void PileUp::endRun(const edm::EventSetup& setup) {
+    if (provider_.get() != nullptr) {
+      provider_->endRun(setup);
+    }
   }
-  void PileUp::endLuminosityBlock(const edm::LuminosityBlock& l, const edm::EventSetup& setup) {
+  void PileUp::endLuminosityBlock(const edm::EventSetup& setup) {
+    if (provider_.get() != nullptr) {
+      provider_->endLuminosityBlock(setup);
+    }
   }
 
   void PileUp::reload(const edm::EventSetup & setup){

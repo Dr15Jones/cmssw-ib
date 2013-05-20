@@ -143,6 +143,16 @@ namespace edm {
     }
   }
 
+  void XXX::beginRun(const edm::EventSetup& setup) {
+  }
+  void XXX::beginLuminosityBlock(const edm::EventSetup& setup) {
+  }
+
+  void XXX::endRun(const edm::EventSetup& setup) {
+  }
+  void XXX::endLuminosityBlock(const edm::EventSetup& setup) {
+  }
+
   void XXX::beginJob(ProductRegistry const& iRegistry) {
     auto const runLookup = iRegistry.productLookup(InRun);
     auto const lumiLookup = iRegistry.productLookup(InLumi);

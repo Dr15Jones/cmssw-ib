@@ -201,29 +201,29 @@ namespace edm {
   BMixingModule::~BMixingModule() {;}
 
   // update method call at begin run/lumi to reload the mixing configuration
-  void BMixingModule::beginLuminosityBlock(edm::LuminosityBlock const& lb, edm::EventSetup const& setup){
+  void BMixingModule::beginLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const& setup){
     update(setup);
     for (size_t endIdx=0; endIdx<maxNbSources_; ++endIdx) {
-      if(inputSources_[endIdx]) inputSources_[endIdx]->beginLuminosityBlock(lb, setup);
+      if(inputSources_[endIdx]) inputSources_[endIdx]->beginLuminosityBlock(setup);
     }
   }
 
-  void BMixingModule::beginRun(edm::Run const& r, edm::EventSetup const& setup){
+  void BMixingModule::beginRun(edm::Run const&, edm::EventSetup const& setup){
     update(setup);
     for (size_t endIdx=0; endIdx<maxNbSources_; ++endIdx) {
-      if(inputSources_[endIdx]) inputSources_[endIdx]->beginRun(r, setup);
+      if(inputSources_[endIdx]) inputSources_[endIdx]->beginRun(setup);
     }
   }
 
-  void BMixingModule::endLuminosityBlock(edm::LuminosityBlock const& lb, edm::EventSetup const& setup){
+  void BMixingModule::endLuminosityBlock(edm::LuminosityBlock const&, edm::EventSetup const& setup){
     for (size_t endIdx=0; endIdx<maxNbSources_; ++endIdx) {
-      if(inputSources_[endIdx]) inputSources_[endIdx]->endLuminosityBlock(lb, setup);
+      if(inputSources_[endIdx]) inputSources_[endIdx]->endLuminosityBlock(setup);
     }
   }
 
-  void BMixingModule::endRun(edm::Run const& r, edm::EventSetup const& setup){
+  void BMixingModule::endRun(edm::Run const&, edm::EventSetup const& setup){
     for (size_t endIdx=0; endIdx<maxNbSources_; ++endIdx) {
-      if(inputSources_[endIdx]) inputSources_[endIdx]->endRun(r, setup);
+      if(inputSources_[endIdx]) inputSources_[endIdx]->endRun(setup);
     }
   }
 
@@ -238,7 +238,6 @@ namespace edm {
 
   // Functions that get called by framework every event
   void BMixingModule::produce(edm::Event& e, const edm::EventSetup& setup) { 
-
     // Check if the signal is present in the root file 
     // for all the objects we want to mix
     checkSignal(e);

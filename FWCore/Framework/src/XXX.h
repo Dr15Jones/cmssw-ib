@@ -60,6 +60,12 @@ namespace edm {
     void beginJob(ProductRegistry const& iRegistry);
     void endJob();
 
+    void beginRun(const edm::EventSetup& setup);
+    void beginLuminosityBlock(const edm::EventSetup& setup);
+
+    void endRun(const edm::EventSetup& setup);
+    void endLuminosityBlock(const edm::EventSetup& setup);
+
   private:
 
     AllWorkers::const_iterator workersBegin() const {

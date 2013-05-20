@@ -53,11 +53,11 @@ namespace edm {
     void beginJob();
     void endJob();
 
-    void beginRun(const edm::Run& r, const edm::EventSetup& setup);
-    void beginLuminosityBlock(const edm::LuminosityBlock& l, const edm::EventSetup& setup);
+    void beginRun(const edm::EventSetup& setup);
+    void beginLuminosityBlock(const edm::EventSetup& setup);
 
-    void endRun(const edm::Run& r, const edm::EventSetup& setup);
-    void endLuminosityBlock(const edm::LuminosityBlock& l, const edm::EventSetup& setup);
+    void endRun(const edm::EventSetup& setup);
+    void endLuminosityBlock(const edm::EventSetup& setup);
 
 
     void reload(const edm::EventSetup & setup);

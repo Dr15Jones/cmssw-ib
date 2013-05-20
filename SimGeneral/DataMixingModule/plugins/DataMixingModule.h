@@ -1,5 +1,5 @@
-#ifndef DataMixingModule_h
-#define SimDataMixingModule_h
+#ifndef SimGeneral_DataMixingModule_DataMixingModule_h
+#define SimGeneral_DataMixingModule_DataMixingModule_h
 
 /** \class DataMixingModule
  *
