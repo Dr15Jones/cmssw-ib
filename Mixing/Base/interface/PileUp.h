@@ -97,7 +97,7 @@ namespace edm {
     std::unique_ptr<VectorInputSource> const input_;
     boost::shared_ptr<ProcessConfiguration> processConfiguration_;
     std::unique_ptr<EventPrincipal> eventPrincipal_;
-    std::unique_ptr<LuminosityBlockPrincipal> lumiPrincipal_;
+    boost::shared_ptr<LuminosityBlockPrincipal> lumiPrincipal_;
     std::unique_ptr<RunPrincipal> runPrincipal_;
     std::unique_ptr<XXX> provider_;
     std::unique_ptr<CLHEP::RandPoissonQ> poissonDistribution_;
