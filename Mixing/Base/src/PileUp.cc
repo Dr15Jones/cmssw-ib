@@ -17,7 +17,7 @@
 
 #include "FWCore/Framework/interface/ESHandle.h"
 #include "FWCore/Framework/interface/EventSetup.h"
-#include "FWCore/Framework/src/XXX.h"
+#include "Mixing/Base/src/XXX.h"
 #include "CondFormats/DataRecord/interface/MixingRcd.h"
 #include "CondFormats/RunInfo/interface/MixingModuleConfig.h"
 

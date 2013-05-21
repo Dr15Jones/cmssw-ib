@@ -1,4 +1,4 @@
-#include "FWCore/Framework/src/XXX.h"
+#include "Mixing/Base/src/XXX.h"
 
 #include "DataFormats/Provenance/interface/ProcessConfiguration.h"
 #include "DataFormats/Provenance/interface/ProductRegistry.h"
