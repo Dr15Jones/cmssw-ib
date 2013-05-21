@@ -69,8 +69,8 @@ namespace edm {
                                        *processConfiguration_,
                                        nullptr));
 
-    if(pset.existsAs<ParameterSet>("producers", true)) {
-      ParameterSet producers = pset.getParameter<ParameterSet>("producers");
+    if(pset.existsAs<std::vector<ParameterSet> >("producers", true)) {
+      std::vector<ParameterSet> producers = pset.getParameter<std::vector<ParameterSet> >("producers");
       provider_.reset(new XXX(producers, *productRegistry_, ActionTable(), processConfiguration_));
     }
 

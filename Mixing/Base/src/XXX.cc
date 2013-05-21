@@ -35,18 +35,9 @@
 #include <exception>
 
 namespace edm {
-  namespace {
-
-    // -----------------------------
-
-    bool binary_search_string(std::vector<std::string> const& v, std::string const& s) {
-      return std::binary_search(v.begin(), v.end(), s);
-    }
-  }
-
   // -----------------------------
 
-  XXX::XXX(ParameterSet& proc_pset,
+  XXX::XXX(std::vector<ParameterSet>& psets,
                      ProductRegistry& preg,
                      ActionTable const& actions,
                      boost::shared_ptr<ProcessConfiguration> processConfiguration) :
@@ -55,6 +46,7 @@ namespace edm {
     act_table_(&actions),
     all_workers_(),
     unscheduled_(new UnscheduledCallProducer) {
+/*
 
     //See if all modules were used
     std::set<std::string> usedWorkerLabels;
@@ -63,7 +55,7 @@ namespace edm {
         ++itWorker) {
       usedWorkerLabels.insert((*itWorker)->description().moduleLabel());
     }
-    std::vector<std::string> unusedLabels(proc_pset.getParameter<std::vector<std::string> >("@all_modules"));
+    std::vector<std::string> unusedLabels; // QQQ Must be filled in
     bool allowUnscheduled = true;
     std::set<std::string> unscheduledLabels;
     std::vector<std::string>  shouldBeUsedLabels;
@@ -134,6 +126,7 @@ namespace edm {
     // Sanity check: make sure nobody has added a worker after we've
     // already relied on all_workers_ being full.
     assert (all_workers_count == all_workers_.size());
+*/
   } // XXX::XXX
   
   void XXX::endJob() {

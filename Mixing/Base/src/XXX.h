@@ -47,7 +47,7 @@ namespace edm {
 
     typedef std::vector<Worker*> Workers;
 
-    XXX(ParameterSet& proc_pset,
+    XXX(std::vector<ParameterSet>& psets,
              ProductRegistry& pregistry,
              ActionTable const& actions,
              boost::shared_ptr<ProcessConfiguration> processConfiguration);
