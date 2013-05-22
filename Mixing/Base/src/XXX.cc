@@ -46,65 +46,29 @@ namespace edm {
     act_table_(&actions),
     all_workers_(),
     unscheduled_(new UnscheduledCallProducer) {
-/*
 
-    //See if all modules were used
-    std::set<std::string> usedWorkerLabels;
-    for (AllWorkers::iterator itWorker = workersBegin();
-        itWorker != workersEnd();
-        ++itWorker) {
-      usedWorkerLabels.insert((*itWorker)->description().moduleLabel());
-    }
-    std::vector<std::string> unusedLabels; // QQQ Must be filled in
-    bool allowUnscheduled = true;
+    std::cerr << "BARF # PSets " << psets.size() << std::endl; 
+
+    std::vector<std::string> unusedLabels;
     std::set<std::string> unscheduledLabels;
-    std::vector<std::string>  shouldBeUsedLabels;
-    if (!unusedLabels.empty()) {
+    for (auto& pset : psets) {
+	std::cerr << pset.dump() << std::endl;
+
+        std::string label = pset.getParameter<std::string>("@module_label");
+        unusedLabels.push_back(label);
       //Need to
       // 1) create worker
       // 2) if it is a WorkerT<EDProducer>, add it to our list
-      // 3) hand list to our delayed reader
-
-      for (std::vector<std::string>::iterator itLabel = unusedLabels.begin(), itLabelEnd = unusedLabels.end();
-          itLabel != itLabelEnd;
-          ++itLabel) {
-        if (allowUnscheduled) {
-          bool isTracked;
-          ParameterSet* modulePSet(proc_pset.getPSetForUpdate(*itLabel, isTracked));
-          assert(isTracked);
-          assert(modulePSet != 0);
-          WorkerParams params(proc_pset, modulePSet, preg,
-                              processConfiguration, *act_table_);
-          Worker* newWorker(worker_reg_.getWorker(params, *itLabel));
-          if (newWorker->moduleType() == Worker::kProducer ||
-              newWorker->moduleType() == Worker::kFilter) {
-            unscheduledLabels.insert(*itLabel);
-            unscheduled_->addWorker(newWorker);
-            //add to list so it gets reset each new event
-            addToAllWorkers(newWorker);
-          } else {
-            //not a producer so should be marked as not used
-            shouldBeUsedLabels.push_back(*itLabel);
-          }
-        } else {
-          //everthing is marked are unused so no 'on demand' allowed
-          shouldBeUsedLabels.push_back(*itLabel);
+        WorkerParams params(pset, &pset, preg,
+                            processConfiguration, *act_table_);
+        Worker* newWorker(worker_reg_.getWorker(params, label));
+        if (newWorker->moduleType() == Worker::kProducer ||
+            newWorker->moduleType() == Worker::kFilter) {
+          unscheduledLabels.insert(label);
+          unscheduled_->addWorker(newWorker);
+          //add to list so it gets reset each new event
+          addToAllWorkers(newWorker);
         }
-      }
-      if (!shouldBeUsedLabels.empty()) {
-        std::ostringstream unusedStream;
-        unusedStream << "'" << shouldBeUsedLabels.front() << "'";
-        for (std::vector<std::string>::iterator itLabel = shouldBeUsedLabels.begin() + 1,
-              itLabelEnd = shouldBeUsedLabels.end();
-            itLabel != itLabelEnd;
-            ++itLabel) {
-          unusedStream << ",'" << *itLabel << "'";
-        }
-        LogInfo("path")
-          << "The following module labels are not assigned to any path:\n"
-          << unusedStream.str()
-          << "\n";
-      }
     }
     if (!unscheduledLabels.empty()) {
       for (ProductRegistry::ProductList::const_iterator it = preg.productList().begin(),
@@ -126,7 +90,6 @@ namespace edm {
     // Sanity check: make sure nobody has added a worker after we've
     // already relied on all_workers_ being full.
     assert (all_workers_count == all_workers_.size());
-*/
   } // XXX::XXX
   
   void XXX::endJob() {
