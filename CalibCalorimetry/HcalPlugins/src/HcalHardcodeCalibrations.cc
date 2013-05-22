@@ -1,6 +1,6 @@
 // -*- C++ -*-
 // Original Author:  Fedor Ratnikov
-// $Id: HcalHardcodeCalibrations.cc,v 1.39 2013/04/18 19:56:14 dlange Exp $
+// $Id: HcalHardcodeCalibrations.cc,v 1.43 2013/04/23 16:06:26 abdullin Exp $
 //
 //
 
@@ -108,9 +108,14 @@ namespace {
 
 }
 
-HcalHardcodeCalibrations::HcalHardcodeCalibrations ( const edm::ParameterSet& iConfig ): he_recalibration(0)
+HcalHardcodeCalibrations::HcalHardcodeCalibrations ( const edm::ParameterSet& iConfig ): he_recalibration(0), hf_recalibration(0)
 {
   edm::LogInfo("HCAL") << "HcalHardcodeCalibrations::HcalHardcodeCalibrations->...";
+
+  if ( iConfig.exists("GainWidthsForTrigPrims") ) 
+    switchGainWidthsForTrigPrims = iConfig.getParameter<bool>("GainWidthsForTrigPrims");
+  else  switchGainWidthsForTrigPrims = false;
+       
 
   // HE recalibration preparation
   iLumi = 0.;
@@ -118,8 +123,12 @@ HcalHardcodeCalibrations::HcalHardcodeCalibrations ( const edm::ParameterSet& iC
     iLumi=iConfig.getParameter<double>("iLumi");
 
   if( iLumi > 0.0 ) {
-    he_recalibration = new HERecalibration(iLumi);
-    //    std::cout << " HcalHardcodeCalibrations:  iLumi = " <<  iLumi << std::endl;
+    bool he_recalib = iConfig.getParameter<bool>("HERecalibration");
+    bool hf_recalib = iConfig.getParameter<bool>("HFRecalibration");
+    if(he_recalib)  he_recalibration = new HERecalibration(iLumi);
+    if(hf_recalib)  hf_recalibration = new HFRecalibration();
+    
+    //     std::cout << " HcalHardcodeCalibrations:  iLumi = " <<  iLumi << std::endl;
   }
 
   bool relabel_=false;
@@ -144,16 +153,16 @@ HcalHardcodeCalibrations::HcalHardcodeCalibrations ( const edm::ParameterSet& iC
       }
       
       /*
-           std::cout << name;
-      for (unsigned int k=0; k<m_segmentation[i].size(); ++k) {
+      std::cout << name;
+      for (unsigned int k=0; k<m_segmentation[i].size(); k++) {
 	std::cout << " [" << k << "] " << m_segmentation[i][k];
       }
       std::cout << std::endl;
-      */     
+      */
 
     }
 
-    he_recalibration->setDsegm(m_segmentation);
+    if(he_recalibration !=0) he_recalibration->setDsegm(m_segmentation);
   }
 
 
@@ -258,7 +267,8 @@ HcalHardcodeCalibrations::HcalHardcodeCalibrations ( const edm::ParameterSet& iC
 
 HcalHardcodeCalibrations::~HcalHardcodeCalibrations()
 {
-  delete he_recalibration;
+  if (he_recalibration != 0 ) delete he_recalibration;
+  if (hf_recalibration != 0 ) delete hf_recalibration;
 }
 
 //
@@ -326,7 +336,11 @@ std::auto_ptr<HcalGainWidths> HcalHardcodeCalibrations::produceGainWidths (const
   std::vector <HcalGenericDetId> cells = allCells(*topo);
   for (std::vector <HcalGenericDetId>::const_iterator cell = cells.begin (); cell != cells.end (); cell++) {
 
-    if( !cell->isHcalTrigTowerDetId()) {
+    // for Upgrade - include TrigPrims, for regular case - only HcalDetId 
+    if(switchGainWidthsForTrigPrims) {
+      HcalGainWidth item = HcalDbHardcode::makeGainWidth (*cell);
+      result->addValues(item);
+    } else if (!cell->isHcalTrigTowerDetId()) {
       HcalGainWidth item = HcalDbHardcode::makeGainWidth (*cell);
       result->addValues(item);
     }
@@ -381,17 +395,32 @@ std::auto_ptr<HcalRespCorrs> HcalHardcodeCalibrations::produceRespCorrs (const H
   std::vector <HcalGenericDetId> cells = allCells(*topo);
   for (std::vector <HcalGenericDetId>::const_iterator cell = cells.begin (); cell != cells.end (); cell++) {
 
-    double corr = 1.0;  
-    if ((*cell).genericSubdet() == HcalGenericDetId::HcalGenEndcap) {
+    double corr = 1.0; 
+
+    if ((he_recalibration != 0 ) && 
+	((*cell).genericSubdet() == HcalGenericDetId::HcalGenEndcap)) {
       
       int depth_ = HcalDetId(*cell).depth();
       int ieta_  = HcalDetId(*cell).ieta();
       corr = he_recalibration->getCorr(ieta_, depth_); 
+      
+      /*
+	std::cout << "HE ieta, depth = " << ieta_  << ",  " << depth_  
+	<< "   corr = "  << corr << std::endl;
+      */
+
+    }
+    else if ((hf_recalibration != 0 ) && 
+	((*cell).genericSubdet() == HcalGenericDetId::HcalGenForward)) {   
+      int depth_ = HcalDetId(*cell).depth();
+      int ieta_  = HcalDetId(*cell).ieta();
+      corr = hf_recalibration->getCorr(ieta_, depth_, iLumi); 
 
       /*
-           std::cout << "HE ieta, depth = " << ieta_  << ",  " << depth_  
-		     << "   corr = "  << corr << std::endl;
+	std::cout << "HF ieta, depth = " << ieta_  << ",  " << depth_  
+	<< "   corr = "  << corr << std::endl;
       */
+
     }
 
     HcalRespCorr item(cell->rawId(),corr);

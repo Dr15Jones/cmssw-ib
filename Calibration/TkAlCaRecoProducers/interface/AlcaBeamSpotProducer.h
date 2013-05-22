@@ -9,7 +9,7 @@
 
  author: Francisco Yumiceva, Fermilab (yumiceva@fnal.gov)
 
- version $Id: AlcaBeamSpotProducer.h,v 1.1 2010/06/21 18:02:19 yumiceva Exp $
+ version $Id: AlcaBeamSpotProducer.h,v 1.2 2013/05/17 20:25:10 chrjones Exp $
 
 ________________________________________________________________**/
 
@@ -18,21 +18,23 @@ ________________________________________________________________**/
 #include <string>
 // CMS
 #include "FWCore/Framework/interface/Frameworkfwd.h"
-#include "FWCore/Framework/interface/EDProducer.h"
+#include "FWCore/Framework/interface/one/EDProducer.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 #include "RecoVertex/BeamSpotProducer/interface/BeamFitter.h"
 
 
-class AlcaBeamSpotProducer : public edm::EDProducer {
+class AlcaBeamSpotProducer : public edm::one::EDProducer<edm::EndLuminosityBlockProducer,
+                                                         edm::one::WatchLuminosityBlocks> {
  public:
   explicit AlcaBeamSpotProducer(const edm::ParameterSet&);
   ~AlcaBeamSpotProducer();
 
  private:
-  virtual void beginLuminosityBlock(edm::LuminosityBlock& lumiSeg, const edm::EventSetup& iSetup);
-  virtual void endLuminosityBlock  (edm::LuminosityBlock& lumiSeg, const edm::EventSetup& iSetup);
-  virtual void produce             (edm::Event& iEvent, const edm::EventSetup& iSetup);
+  virtual void beginLuminosityBlock     (edm::LuminosityBlock const& lumiSeg, const edm::EventSetup& iSetup) override final;
+  virtual void endLuminosityBlock       (edm::LuminosityBlock const& lumiSeg, const edm::EventSetup& iSetup) override final;
+  virtual void endLuminosityBlockProduce(edm::LuminosityBlock& lumiSeg, const edm::EventSetup& iSetup) override final;
+  virtual void produce                  (edm::Event& iEvent, const edm::EventSetup& iSetup) override final;
   
   int ftotalevents;
   int fitNLumi_;
