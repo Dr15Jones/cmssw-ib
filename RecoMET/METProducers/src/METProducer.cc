@@ -5,7 +5,7 @@
 // 
 // Original Author:  Rick Cavanaugh
 //         Created:  April 4, 2006
-// $Id: METProducer.cc,v 1.51 2012/08/14 13:11:37 eulisse Exp $
+// $Id: METProducer.cc,v 1.53 2013/05/07 13:16:16 salee Exp $
 //
 //
 
@@ -70,7 +70,8 @@ namespace cms
     else if( METtype == "GenMET" )  
       {
 	onlyFiducial = iConfig.getParameter<bool>("onlyFiducialParticles");
-        usePt = iConfig.getUntrackedParameter<bool>("usePt", false);
+        usePt = iConfig.getParameter<bool>("usePt");
+        applyFiducialThresholdForFractions = iConfig.getParameter<bool>("applyFiducialThresholdForFractions");
 	produces<reco::GenMETCollection>().setBranchAlias(alias.c_str());
       }
     else if( METtype == "PFMET" )
@@ -232,7 +233,7 @@ namespace cms
     GenSpecificAlgo gen;
     std::auto_ptr<reco::GenMETCollection> genmetcoll;
     genmetcoll.reset (new reco::GenMETCollection);
-    genmetcoll->push_back( gen.addInfo(input, &commonMETdata, globalThreshold, onlyFiducial, usePt) );
+    genmetcoll->push_back( gen.addInfo(input, &commonMETdata, globalThreshold, onlyFiducial,applyFiducialThresholdForFractions, usePt) );
     event.put( genmetcoll );
   }
   

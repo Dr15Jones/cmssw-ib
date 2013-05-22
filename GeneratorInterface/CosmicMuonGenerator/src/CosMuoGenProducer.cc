@@ -112,7 +112,7 @@ edm::CosMuoGenProducer::~CosMuoGenProducer(){
   clear();
 }
 
-void edm::CosMuoGenProducer::endRun( Run &run, const EventSetup& es )
+void edm::CosMuoGenProducer::endRunProduce( Run &run, const EventSetup& es )
 {
   std::auto_ptr<GenRunInfoProduct> genRunInfo(new GenRunInfoProduct());
 
