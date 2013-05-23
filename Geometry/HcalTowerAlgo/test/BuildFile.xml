@@ -10,3 +10,6 @@
 <library   file="HcalGeometryAnalyzer.cc" name="testHcalGeometryESProducer">
  <flags   EDM_PLUGIN="1"/>
 </library>
+<library   file="HcalGeometryDetIdAnalyzer.cc" name="testHcalGeometryDetIdESProducer">
+ <flags   EDM_PLUGIN="1"/>
+</library>
