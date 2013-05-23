@@ -1,11 +1,11 @@
-# /dev/CMSSW_6_2_0/GRun/V12 (CMSSW_6_2_0_pre6_HLT1)
+# /dev/CMSSW_6_2_0/GRun/V14 (CMSSW_6_2_0_pre6_HLT2)
 
 import FWCore.ParameterSet.Config as cms
 
 process = cms.Process( "HLTGRun" )
 
 process.HLTConfigVersion = cms.PSet(
-  tableName = cms.string('/dev/CMSSW_6_2_0/GRun/V12')
+  tableName = cms.string('/dev/CMSSW_6_2_0/GRun/V14')
 )
 
 process.streams = cms.PSet( 
@@ -917,6 +917,7 @@ process.datasets = cms.PSet(
     'HLT_DiPFJetAve400_v11',
     'HLT_DiPFJetAve40_v10',
     'HLT_DiPFJetAve80_v11',
+    'HLT_DoubleMu5_Ele8_CaloIdT_TrkIdVL_v17',
     'HLT_Ele22_CaloIdL_CaloIsoVL_v7',
     'HLT_Ele27_CaloIdL_CaloIsoVL_TrkIdVL_TrkIsoVL_v12',
     'HLT_Ele27_WP80_PFMET_MT50_v9',
@@ -1025,7 +1026,6 @@ process.datasets = cms.PSet(
     'HLT_DoubleMu4_Dimuon7_Bs_Forward_v6',
     'HLT_DoubleMu4_JpsiTk_Displaced_v8',
     'HLT_DoubleMu4_Jpsi_Displaced_v13',
-    'HLT_DoubleMu5_Ele8_CaloIdT_TrkIdVL_v17',
     'HLT_DoubleMu5_IsoMu5_v21',
     'HLT_DoubleMu8_Ele8_CaloIdT_TrkIdVL_v6',
     'HLT_DoubleMu8_Mass8_PFNoPUHT175_v5',
@@ -1206,8 +1206,8 @@ process.datasets = cms.PSet(
     'HLT_MET80_Track60_dEdx3p7_v7',
     'HLT_MET80_v5',
     'HLT_MonoCentralPFJet80_PFMETnoMu105_NHEF0p95_v5',
-    'HLT_Mu12_eta2p1_DiCentral_20_v9')+cms.vstring( 'HLT_Mu12_eta2p1_DiCentral_40_20_BTagIP3D1stTrack_v9',
-    'HLT_Mu12_eta2p1_DiCentral_40_20_DiBTagIP3D1stTrack_v9',
+    'HLT_Mu12_eta2p1_DiCentral_20_v9',
+    'HLT_Mu12_eta2p1_DiCentral_40_20_BTagIP3D1stTrack_v9')+cms.vstring( 'HLT_Mu12_eta2p1_DiCentral_40_20_DiBTagIP3D1stTrack_v9',
     'HLT_Mu12_eta2p1_DiCentral_40_20_v9',
     'HLT_Mu12_eta2p1_L1Mu10erJetC12WdEtaPhi1DiJetsC_v8',
     'HLT_Mu12_v19',
@@ -1607,7 +1607,7 @@ process.magfield = cms.ESSource( "XMLIdealGeometryESSource",
       'Geometry/CMSCommonData/data/cms.xml',
       'Geometry/CMSCommonData/data/cmsMagneticField.xml',
       'MagneticField/GeomBuilder/data/MagneticFieldVolumes_1103l.xml',
-      'MagneticField/GeomBuilder/data/MagneticFieldParameters_07_2pi.xml' ),
+      'Geometry/CMSCommonData/data/materials.xml' ),
     rootNodeName = cms.string( "cmsMagneticField:MAGF" )
 )
 
@@ -1902,7 +1902,6 @@ process.TransientTrackBuilderESProducer = cms.ESProducer( "TransientTrackBuilder
 )
 process.VBF0 = cms.ESProducer( "VolumeBasedMagneticFieldESProducer",
   scalingVolumes = cms.vint32(  ),
-  overrideMasterSector = cms.bool( True ),
   useParametrizedTrackerField = cms.bool( True ),
   scalingFactors = cms.vdouble(  ),
   label = cms.untracked.string( "0t" ),
@@ -1910,11 +1909,17 @@ process.VBF0 = cms.ESProducer( "VolumeBasedMagneticFieldESProducer",
   debugBuilder = cms.untracked.bool( False ),
   paramLabel = cms.string( "slave_0" ),
   geometryVersion = cms.int32( 71212 ),
+  gridFiles = cms.VPSet( 
+    cms.PSet(  path = cms.string( "grid.[v].bin" ),
+      master = cms.int32( 1 ),
+      sectors = cms.string( "0" ),
+      volumes = cms.string( "1-312" )
+    )
+  ),
   cacheLastVolume = cms.untracked.bool( True )
 )
 process.VBF20 = cms.ESProducer( "VolumeBasedMagneticFieldESProducer",
   scalingVolumes = cms.vint32(  ),
-  overrideMasterSector = cms.bool( True ),
   useParametrizedTrackerField = cms.bool( True ),
   scalingFactors = cms.vdouble(  ),
   label = cms.untracked.string( "071212_2t" ),
@@ -1922,11 +1927,17 @@ process.VBF20 = cms.ESProducer( "VolumeBasedMagneticFieldESProducer",
   debugBuilder = cms.untracked.bool( False ),
   paramLabel = cms.string( "slave_20" ),
   geometryVersion = cms.int32( 71212 ),
+  gridFiles = cms.VPSet( 
+    cms.PSet(  path = cms.string( "grid.[v].bin" ),
+      master = cms.int32( 1 ),
+      sectors = cms.string( "0" ),
+      volumes = cms.string( "1-312" )
+    )
+  ),
   cacheLastVolume = cms.untracked.bool( True )
 )
 process.VBF30 = cms.ESProducer( "VolumeBasedMagneticFieldESProducer",
   scalingVolumes = cms.vint32(  ),
-  overrideMasterSector = cms.bool( True ),
   useParametrizedTrackerField = cms.bool( True ),
   scalingFactors = cms.vdouble(  ),
   label = cms.untracked.string( "071212_3t" ),
@@ -1934,11 +1945,17 @@ process.VBF30 = cms.ESProducer( "VolumeBasedMagneticFieldESProducer",
   debugBuilder = cms.untracked.bool( False ),
   paramLabel = cms.string( "slave_30" ),
   geometryVersion = cms.int32( 71212 ),
+  gridFiles = cms.VPSet( 
+    cms.PSet(  path = cms.string( "grid.[v].bin" ),
+      master = cms.int32( 1 ),
+      sectors = cms.string( "0" ),
+      volumes = cms.string( "1-312" )
+    )
+  ),
   cacheLastVolume = cms.untracked.bool( True )
 )
 process.VBF35 = cms.ESProducer( "VolumeBasedMagneticFieldESProducer",
   scalingVolumes = cms.vint32(  ),
-  overrideMasterSector = cms.bool( True ),
   useParametrizedTrackerField = cms.bool( True ),
   scalingFactors = cms.vdouble(  ),
   label = cms.untracked.string( "071212_3_5t" ),
@@ -1946,11 +1963,17 @@ process.VBF35 = cms.ESProducer( "VolumeBasedMagneticFieldESProducer",
   debugBuilder = cms.untracked.bool( False ),
   paramLabel = cms.string( "slave_35" ),
   geometryVersion = cms.int32( 71212 ),
+  gridFiles = cms.VPSet( 
+    cms.PSet(  path = cms.string( "grid.[v].bin" ),
+      master = cms.int32( 1 ),
+      sectors = cms.string( "0" ),
+      volumes = cms.string( "1-312" )
+    )
+  ),
   cacheLastVolume = cms.untracked.bool( True )
 )
 process.VBF38 = cms.ESProducer( "VolumeBasedMagneticFieldESProducer",
   scalingVolumes = cms.vint32( 14100, 14200, 17600, 17800, 17900, 18100, 18300, 18400, 18600, 23100, 23300, 23400, 23600, 23800, 23900, 24100, 28600, 28800, 28900, 29100, 29300, 29400, 29600, 28609, 28809, 28909, 29109, 29309, 29409, 29609, 28610, 28810, 28910, 29110, 29310, 29410, 29610, 28611, 28811, 28911, 29111, 29311, 29411, 29611 ),
-  overrideMasterSector = cms.bool( False ),
   useParametrizedTrackerField = cms.bool( True ),
   scalingFactors = cms.vdouble( 1.0, 1.0, 0.994, 1.004, 1.004, 1.005, 1.004, 1.004, 0.994, 0.965, 0.958, 0.958, 0.953, 0.958, 0.958, 0.965, 0.918, 0.924, 0.924, 0.906, 0.924, 0.924, 0.918, 0.991, 0.998, 0.998, 0.978, 0.998, 0.998, 0.991, 0.991, 0.998, 0.998, 0.978, 0.998, 0.998, 0.991, 0.991, 0.998, 0.998, 0.978, 0.998, 0.998, 0.991 ),
   label = cms.untracked.string( "090322_3_8t" ),
@@ -1958,11 +1981,42 @@ process.VBF38 = cms.ESProducer( "VolumeBasedMagneticFieldESProducer",
   debugBuilder = cms.untracked.bool( False ),
   paramLabel = cms.string( "slave_38" ),
   geometryVersion = cms.int32( 71212 ),
+  gridFiles = cms.VPSet( 
+    cms.PSet(  path = cms.string( "grid.[v].bin" ),
+      master = cms.int32( 1 ),
+      sectors = cms.string( "0" ),
+      volumes = cms.string( "1-312" )
+    ),
+    cms.PSet(  path = cms.string( "S3/grid.[v].bin" ),
+      master = cms.int32( 3 ),
+      sectors = cms.string( "3" ),
+      volumes = cms.string( "176-186,231-241,286-296" )
+    ),
+    cms.PSet(  path = cms.string( "S4/grid.[v].bin" ),
+      master = cms.int32( 4 ),
+      sectors = cms.string( "4" ),
+      volumes = cms.string( "176-186,231-241,286-296" )
+    ),
+    cms.PSet(  path = cms.string( "S9/grid.[v].bin" ),
+      master = cms.int32( 9 ),
+      sectors = cms.string( "9" ),
+      volumes = cms.string( "14,15,20,21,24-27,32,33,40,41,48,49,56,57,62,63,70,71,286-296" )
+    ),
+    cms.PSet(  path = cms.string( "S10/grid.[v].bin" ),
+      master = cms.int32( 10 ),
+      sectors = cms.string( "10" ),
+      volumes = cms.string( "14,15,20,21,24-27,32,33,40,41,48,49,56,57,62,63,70,71,286-296" )
+    ),
+    cms.PSet(  path = cms.string( "S11/grid.[v].bin" ),
+      master = cms.int32( 11 ),
+      sectors = cms.string( "11" ),
+      volumes = cms.string( "14,15,20,21,24-27,32,33,40,41,48,49,56,57,62,63,70,71,286-296" )
+    )
+  ),
   cacheLastVolume = cms.untracked.bool( True )
 )
 process.VBF40 = cms.ESProducer( "VolumeBasedMagneticFieldESProducer",
   scalingVolumes = cms.vint32(  ),
-  overrideMasterSector = cms.bool( True ),
   useParametrizedTrackerField = cms.bool( True ),
   scalingFactors = cms.vdouble(  ),
   label = cms.untracked.string( "071212_4t" ),
@@ -1970,6 +2024,13 @@ process.VBF40 = cms.ESProducer( "VolumeBasedMagneticFieldESProducer",
   debugBuilder = cms.untracked.bool( False ),
   paramLabel = cms.string( "slave_40" ),
   geometryVersion = cms.int32( 71212 ),
+  gridFiles = cms.VPSet( 
+    cms.PSet(  path = cms.string( "grid.[v].bin" ),
+      master = cms.int32( 1 ),
+      sectors = cms.string( "0" ),
+      volumes = cms.string( "1-312" )
+    )
+  ),
   cacheLastVolume = cms.untracked.bool( True )
 )
 process.ZdcGeometryFromDBEP = cms.ESProducer( "ZdcGeometryFromDBEP",
@@ -5717,11 +5778,11 @@ process.PrescaleService = cms.Service( "PrescaleService",
       cms.PSet(  pathName = cms.string( "HLT_L2Mu70_2Cha_eta2p1_PFMET60_v3" ),
         prescales = cms.vuint32( 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 )
       ),
+      cms.PSet(  pathName = cms.string( "HLT_L2Mu10_NoVertex_NoBPTX3BX_NoHalo_v4" ),
+        prescales = cms.vuint32( 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1 )
+      ),
       cms.PSet(  pathName = cms.string( "HLT_L2Mu20_eta2p1_NoVertex_v2" ),
         prescales = cms.vuint32( 5000, 5000, 5000, 5000, 5000, 5000, 5000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1 )
-      ),
-      cms.PSet(  pathName = cms.string( "HLT_L2Mu10_NoVertex_NoBPTX3BX_NoHalo_v4" ),
-        prescales = cms.vuint32( 100, 100, 100, 100, 100, 100, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1 )
       ),
       cms.PSet(  pathName = cms.string( "HLT_L2Mu20_NoVertex_2Cha_NoBPTX3BX_NoHalo_v1" ),
         prescales = cms.vuint32( 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1 )
@@ -15379,33 +15440,6 @@ process.hltPFMHT60Filter = cms.EDFilter( "HLTMhtFilter",
     minMht = cms.double( 60.0 ),
     inputMhtTag = cms.InputTag( "hltPFMETProducer" )
 )
-process.hltPreL2Mu20eta2p1NoVertex = cms.EDFilter( "HLTPrescaler",
-    L1GtReadoutRecordTag = cms.InputTag( "hltGtDigis" ),
-    offset = cms.uint32( 0 )
-)
-process.hltL2MuonCandidatesNoVtx = cms.EDProducer( "L2MuonCandidateProducer",
-    InputObjects = cms.InputTag( "hltL2Muons" )
-)
-process.hltL2fL1sMu16Eta2p1L1f0L2Filtered20 = cms.EDFilter( "HLTMuonL2PreFilter",
-    saveTags = cms.bool( True ),
-    MaxDr = cms.double( 9999.0 ),
-    CutOnChambers = cms.bool( False ),
-    PreviousCandTag = cms.InputTag( "hltL1fL1sMu16Eta2p1L1Filtered0" ),
-    MinPt = cms.double( 20.0 ),
-    MinN = cms.int32( 1 ),
-    SeedMapTag = cms.InputTag( "hltL2Muons" ),
-    MaxEta = cms.double( 2.1 ),
-    MinNhits = cms.vint32( 1 ),
-    MinDxySig = cms.double( -1.0 ),
-    MinNchambers = cms.vint32( 0 ),
-    AbsEtaBins = cms.vdouble( 5.0 ),
-    MaxDz = cms.double( 9999.0 ),
-    CandTag = cms.InputTag( "hltL2MuonCandidatesNoVtx" ),
-    BeamSpotTag = cms.InputTag( "hltOnlineBeamSpot" ),
-    MinDr = cms.double( -1.0 ),
-    NSigmaPt = cms.double( 0.0 ),
-    MinNstations = cms.vint32( 0 )
-)
 process.hltL1sL1SingleMu6NotBptxOR = cms.EDFilter( "HLTLevel1GTSeed",
     saveTags = cms.bool( True ),
     L1SeedsLogicalExpression = cms.string( "L1_SingleMu6_NotBptxOR" ),
@@ -15433,6 +15467,9 @@ process.hltL1fL1sMu6NotBptxORL1Filtered0 = cms.EDFilter( "HLTMuonL1Filter",
     CandTag = cms.InputTag( "hltL1extraParticles" ),
     ExcludeSingleSegmentCSC = cms.bool( False )
 )
+process.hltL2MuonCandidatesNoVtx = cms.EDProducer( "L2MuonCandidateProducer",
+    InputObjects = cms.InputTag( "hltL2Muons" )
+)
 process.hltL2fL1sMu6NoBPTXL1f0L2Filtered10 = cms.EDFilter( "HLTMuonL2PreFilter",
     saveTags = cms.bool( True ),
     MaxDr = cms.double( 9999.0 ),
@@ -15442,6 +15479,30 @@ process.hltL2fL1sMu6NoBPTXL1f0L2Filtered10 = cms.EDFilter( "HLTMuonL2PreFilter",
     MinN = cms.int32( 1 ),
     SeedMapTag = cms.InputTag( "hltL2Muons" ),
     MaxEta = cms.double( 3.0 ),
+    MinNhits = cms.vint32( 1 ),
+    MinDxySig = cms.double( -1.0 ),
+    MinNchambers = cms.vint32( 0 ),
+    AbsEtaBins = cms.vdouble( 5.0 ),
+    MaxDz = cms.double( 9999.0 ),
+    CandTag = cms.InputTag( "hltL2MuonCandidatesNoVtx" ),
+    BeamSpotTag = cms.InputTag( "hltOnlineBeamSpot" ),
+    MinDr = cms.double( -1.0 ),
+    NSigmaPt = cms.double( 0.0 ),
+    MinNstations = cms.vint32( 0 )
+)
+process.hltPreL2Mu20eta2p1NoVertex = cms.EDFilter( "HLTPrescaler",
+    L1GtReadoutRecordTag = cms.InputTag( "hltGtDigis" ),
+    offset = cms.uint32( 0 )
+)
+process.hltL2fL1sMu16Eta2p1L1f0L2Filtered20 = cms.EDFilter( "HLTMuonL2PreFilter",
+    saveTags = cms.bool( True ),
+    MaxDr = cms.double( 9999.0 ),
+    CutOnChambers = cms.bool( False ),
+    PreviousCandTag = cms.InputTag( "hltL1fL1sMu16Eta2p1L1Filtered0" ),
+    MinPt = cms.double( 20.0 ),
+    MinN = cms.int32( 1 ),
+    SeedMapTag = cms.InputTag( "hltL2Muons" ),
+    MaxEta = cms.double( 2.1 ),
     MinNhits = cms.vint32( 1 ),
     MinDxySig = cms.double( -1.0 ),
     MinNchambers = cms.vint32( 0 ),
@@ -45593,8 +45654,8 @@ process.hltPreHLTMONOutputSmart = cms.EDFilter( "TriggerResultsFilter",
       'HLT_L1SingleMu12_v2',
       'HLT_L2Mu70_2Cha_eta2p1_PFMET55_v3',
       'HLT_L2Mu70_2Cha_eta2p1_PFMET60_v3',
-      'HLT_L2Mu20_eta2p1_NoVertex_v2',
       'HLT_L2Mu10_NoVertex_NoBPTX3BX_NoHalo_v4',
+      'HLT_L2Mu20_eta2p1_NoVertex_v2',
       'HLT_L2Mu20_NoVertex_2Cha_NoBPTX3BX_NoHalo_v1',
       'HLT_L2Mu30_NoVertex_2Cha_NoBPTX3BX_NoHalo_v1',
       'HLT_L2TripleMu10_0_0_NoVertex_PFJet40Neutral_v9',
@@ -46576,7 +46637,6 @@ process.hltOutputDQM = cms.OutputModule( "PoolOutputModule",
   'HLT_DoubleMu4_Dimuon7_Bs_Forward_v6',
   'HLT_DoubleMu4_JpsiTk_Displaced_v8',
   'HLT_DoubleMu4_Jpsi_Displaced_v13',
-  'HLT_DoubleMu5_Ele8_CaloIdT_TrkIdVL_v17',
   'HLT_DoubleMu5_IsoMu5_v21',
   'HLT_DoubleMu8_Ele8_CaloIdT_TrkIdVL_v6',
   'HLT_DoubleMu8_Mass8_PFNoPUHT175_v5',
@@ -46757,8 +46817,8 @@ process.hltOutputDQM = cms.OutputModule( "PoolOutputModule",
   'HLT_MET80_Track60_dEdx3p7_v7',
   'HLT_MET80_v5',
   'HLT_MonoCentralPFJet80_PFMETnoMu105_NHEF0p95_v5',
-  'HLT_Mu12_eta2p1_DiCentral_20_v9')+cms.vstring( 'HLT_Mu12_eta2p1_DiCentral_40_20_BTagIP3D1stTrack_v9',
-  'HLT_Mu12_eta2p1_DiCentral_40_20_DiBTagIP3D1stTrack_v9',
+  'HLT_Mu12_eta2p1_DiCentral_20_v9',
+  'HLT_Mu12_eta2p1_DiCentral_40_20_BTagIP3D1stTrack_v9')+cms.vstring( 'HLT_Mu12_eta2p1_DiCentral_40_20_DiBTagIP3D1stTrack_v9',
   'HLT_Mu12_eta2p1_DiCentral_40_20_v9',
   'HLT_Mu12_eta2p1_L1Mu10erJetC12WdEtaPhi1DiJetsC_v8',
   'HLT_Mu12_v19',
@@ -46979,6 +47039,7 @@ process.hltOutputHLTDQM = cms.OutputModule( "PoolOutputModule",
   'HLT_DiPFJetAve400_v11',
   'HLT_DiPFJetAve40_v10',
   'HLT_DiPFJetAve80_v11',
+  'HLT_DoubleMu5_Ele8_CaloIdT_TrkIdVL_v17',
   'HLT_Ele22_CaloIdL_CaloIsoVL_v7',
   'HLT_Ele27_CaloIdL_CaloIsoVL_TrkIdVL_TrkIsoVL_v12',
   'HLT_Ele27_WP80_PFMET_MT50_v9',
@@ -48006,8 +48067,8 @@ process.HLT_L1SingleMuOpen_v7 = cms.Path( process.HLTBeginSequence + process.hlt
 process.HLT_L1SingleMu12_v2 = cms.Path( process.HLTBeginSequence + process.hltL1sL1SingleMu12 + process.hltPreL1SingleMu12 + process.hltL1fL1sMu12L1Filtered0 + process.HLTEndSequence )
 process.HLT_L2Mu70_2Cha_eta2p1_PFMET55_v3 = cms.Path( process.HLTBeginSequence + process.hltL1sMu16Eta2p1 + process.hltPreL2Mu702Chaeta2p1PFMET55 + process.hltL1fL1sMu16Eta2p1L1Filtered0 + process.HLTL2muonrecoSequence + process.hltL2fL1sMu70Eta2p1L1f0L2Filtered70QCha2 + process.HLTRecoMETSequence + process.hltMET35 + process.HLTPFL1FastL2L3ReconstructionSequence + process.hltPFMETProducer + process.hltPFMHT55Filter + process.HLTEndSequence )
 process.HLT_L2Mu70_2Cha_eta2p1_PFMET60_v3 = cms.Path( process.HLTBeginSequence + process.hltL1sMu16Eta2p1 + process.hltPreL2Mu702Chaeta2p1PFMET60 + process.hltL1fL1sMu16Eta2p1L1Filtered0 + process.HLTL2muonrecoSequence + process.hltL2fL1sMu70Eta2p1L1f0L2Filtered70QCha2 + process.HLTRecoMETSequence + process.hltMET40 + process.HLTPFL1FastL2L3ReconstructionSequence + process.hltPFMETProducer + process.hltPFMHT60Filter + process.HLTEndSequence )
-process.HLT_L2Mu20_eta2p1_NoVertex_v2 = cms.Path( process.HLTBeginSequence + process.hltL1sMu16Eta2p1 + process.hltPreL2Mu20eta2p1NoVertex + process.hltL1fL1sMu16Eta2p1L1Filtered0 + process.HLTL2muonrecoSequenceNoVtx + process.hltL2fL1sMu16Eta2p1L1f0L2Filtered20 + process.HLTEndSequence )
 process.HLT_L2Mu10_NoVertex_NoBPTX3BX_NoHalo_v4 = cms.Path( process.HLTBeginSequenceAntiBPTX + process.hltL1sL1SingleMu6NotBptxOR + process.hltL1BeamHaloAntiCoincidence3BX + process.hltPreL2Mu10NoVertexNoBPTX3BXNoHalo + process.hltL1fL1sMu6NotBptxORL1Filtered0 + process.HLTL2muonrecoSequenceNoVtx + process.hltL2fL1sMu6NoBPTXL1f0L2Filtered10 + process.HLTEndSequence )
+process.HLT_L2Mu20_eta2p1_NoVertex_v2 = cms.Path( process.HLTBeginSequence + process.hltL1sMu16Eta2p1 + process.hltPreL2Mu20eta2p1NoVertex + process.hltL1fL1sMu16Eta2p1L1Filtered0 + process.HLTL2muonrecoSequenceNoVtx + process.hltL2fL1sMu16Eta2p1L1f0L2Filtered20 + process.HLTEndSequence )
 process.HLT_L2Mu20_NoVertex_2Cha_NoBPTX3BX_NoHalo_v1 = cms.Path( process.HLTBeginSequenceAntiBPTX + process.hltL1sL1SingleMu6NotBptxOR + process.hltL1BeamHaloAntiCoincidence3BX + process.hltPreL2Mu20NoVertex2ChaNoBPTX3BXNoHalo + process.hltL1fL1sMu6NotBptxORL1Filtered0 + process.HLTL2muonrecoSequenceNoVtx + process.hltL2fL1sMu6NoBPTXL1f0L2Filtered20Cha2 + process.HLTEndSequence )
 process.HLT_L2Mu30_NoVertex_2Cha_NoBPTX3BX_NoHalo_v1 = cms.Path( process.HLTBeginSequenceAntiBPTX + process.hltL1sL1SingleMu6NotBptxOR + process.hltL1BeamHaloAntiCoincidence3BX + process.hltPreL2Mu30NoVertex2ChaNoBPTX3BXNoHalo + process.hltL1fL1sMu6NotBptxORL1Filtered0 + process.HLTL2muonrecoSequenceNoVtx + process.hltL2fL1sMu6NoBPTXL1f0L2Filtered30Cha2 + process.HLTEndSequence )
 process.HLT_L2TripleMu10_0_0_NoVertex_PFJet40Neutral_v9 = cms.Path( process.HLTBeginSequence + process.hltL1sL1TripleMu0ORTripleMu0HighQ + process.hltPreL2TripleMu1000NoVertexPFJet40Neutral + process.hltL1TripleMu0L1TriMuFiltered0 + process.HLTL2muonrecoSequenceNoVtx + process.hltL2TripleMu0NoVertexL2PreFiltered + process.hltL2Mu10NoVertexL2PreFiltered + process.HLTRecoJetSequenceAK5L1FastJetCorrected + process.hltDijet40L1FastJet + process.HLTPFReconstructionSequence + process.HLTPFL1FastL2L3JetsSequenceNeutral + process.hltCentralPFJet40Neutral + process.HLTEndSequence )

@@ -7,8 +7,8 @@
  * One instance is created for each DDVolume. The parameters of the 
  * boundary surfaces are calculated during construction.
  *
- *  $Date: 2009/05/13 15:55:54 $
- *  $Revision: 1.9 $
+ *  $Date: 2013/04/15 16:02:44 $
+ *  $Revision: 1.10 $
  *  \author N. Amapane - INFN Torino
  */
 
@@ -58,8 +58,10 @@ public:
   std::string name;
   /// Name of magnetic field table file
   std::string magFile;
+  /// volume number
+  unsigned short volumeno;
   /// copy number
-  int copyno;
+  unsigned short copyno;
 
   /// Just for debugging...
   static void printUniqueNames(handles::const_iterator begin,

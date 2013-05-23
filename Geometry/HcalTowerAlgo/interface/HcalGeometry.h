@@ -101,11 +101,10 @@ public:
   virtual void getSummary( CaloSubdetectorGeometry::TrVec&  trVector,
 			   CaloSubdetectorGeometry::IVec&   iVector,
 			   CaloSubdetectorGeometry::DimVec& dimVector,
-			   std::vector<uint32_t>& dins ) const ;
-
+			   CaloSubdetectorGeometry::IVec& dinsVector ) const ;
 protected:
 
-  virtual const CaloCellGeometry* cellGeomPtr( uint32_t index ) const ;
+  virtual const CaloCellGeometry* cellGeomPtr( unsigned int index ) const ;
 
   virtual unsigned int indexFor(const DetId& id) const { return  theTopology.detId2denseId(id); }
   virtual unsigned int sizeForDenseIndex(const DetId& id) const { return theTopology.ncells(); }
@@ -128,7 +127,7 @@ private:
   mutable std::vector<DetId> m_hoIds ;
   mutable std::vector<DetId> m_hfIds ;
   mutable std::vector<DetId> m_emptyIds ;
-  mutable std::vector<uint32_t> m_dins;  
+  mutable CaloSubdetectorGeometry::IVec m_dins;  
 
   HBCellVec m_hbCellVec ;
   HECellVec m_heCellVec ;
