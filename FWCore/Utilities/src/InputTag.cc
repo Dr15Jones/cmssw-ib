@@ -141,6 +141,16 @@ namespace edm {
     return *this;
   }
 
+  bool InputTag::skipCurrentProcess() const {
+    char const* p1 = "@skipCurrentProcess";
+    char const* p2 = process_.c_str();
+    while (*p1 && (*p1 == *p2)) {
+      ++p1;
+      ++p2;
+    }
+    return *p1 == *p2;
+  }
+
   std::string InputTag::encode() const {
     //NOTE: since the encoding gets used to form the configuration hash I did not want
     // to change it so that not specifying a process would cause two colons to appear in the

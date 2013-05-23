@@ -61,7 +61,8 @@ int main() {
   edm::InputTag tag1;
   if (tag1.label() != "" ||
       tag1.instance() != "" ||
-      tag1.process() != "") {
+      tag1.process() != "" ||
+      tag1.skipCurrentProcess()) {
     std::cout << "InputTag() failed" << std::endl;
     abort();
   }
@@ -69,7 +70,8 @@ int main() {
   edm::InputTag tag2(std::string("a"), std::string("b"), std::string("c"));
   if (tag2.label() != "a" ||
       tag2.instance() != "b" ||
-      tag2.process() != "c") {
+      tag2.process() != "c" ||
+      tag2.skipCurrentProcess()) {
     std::cout << "InputTag(string,string,string) failed" << std::endl;
     abort();
   }
@@ -135,7 +137,34 @@ int main() {
     std::cout << "InputTag::operator= or constructor, move or copy failed" << std::endl;
     abort();
   }
-  
+
+  edm::InputTag tag12("d", "e", "@skipCurrentProcess");
+  if (tag12.label() != "d" ||
+      tag12.instance() != "e" ||
+      tag12.process() != "@skipCurrentProcess" ||
+      !tag12.skipCurrentProcess()) {
+    std::cout << "Test of tag12 failed" << std::endl;
+    abort();
+  }
+
+  edm::InputTag tag13("d", "e", "@skipCurrentProcessx");
+  if (tag13.skipCurrentProcess()) {
+    std::cout << "Test of tag13 failed" << std::endl;
+    abort();
+  }
+
+  edm::InputTag tag14("d", "e", "@skipCurrentProces");
+  if (tag14.skipCurrentProcess()) {
+    std::cout << "Test of tag14 failed" << std::endl;
+    abort();
+  }
+
+  edm::InputTag tag15("d", "e", "@skipCurrentProcesx");
+  if (tag15.skipCurrentProcess()) {
+    std::cout << "Test of tag15 failed" << std::endl;
+    abort();
+  }
+
   unsigned int index = tag5.indexFor(testTypeID1, edm::InRun, reg1);
   if (index != edm::ProductHolderIndexInvalid) {
     std::cout << "InputTag::indexFor failed" << std::endl;

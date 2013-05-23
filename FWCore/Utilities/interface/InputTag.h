@@ -44,6 +44,8 @@ namespace edm {
     ///an empty string means find the most recently produced 
     ///product with the label and instance
     std::string const& process() const {return process_;} 
+
+    bool skipCurrentProcess() const;
     
     bool operator==(InputTag const& tag) const;
 
