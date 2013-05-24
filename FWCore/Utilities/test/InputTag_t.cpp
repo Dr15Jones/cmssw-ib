@@ -56,31 +56,6 @@ public:
 };
 
 int main() {
-  std::cout << "sizeof(edm::BranchType) = " << sizeof(edm::BranchType) << std::endl;
-  std::cout << "sizeof(edm::TypeID) = " << sizeof(edm::TypeID) << std::endl;
-  std::cout << "sizeof(std::atomic<unsigned int>) = " << sizeof(std::atomic<unsigned int>) << std::endl;
-
-  struct A {
-    edm::BranchType x;
-    char y;
-  };
-  std::cout << "sizeof(A) = " << sizeof(A) << std::endl;
-
-  struct B {
-    edm::TypeID x;
-    char y;
-  };
-  std::cout << "sizeof(B) = " << sizeof(B) << std::endl;
-
-  struct C {
-    std::atomic<unsigned int> x;
-    char y;
-  };
-  std::cout << "sizeof(C) = " << sizeof(C) << std::endl;
-
-  std::cout << "sizeof(std::string) = " << sizeof(std::string) << std::endl;
-
-  std::cout << "sizeof(edm::InputTag) = " << sizeof(edm::InputTag) << std::endl;
 
   edm::InputTag tag1;
   if (tag1.label() != "" ||
@@ -103,7 +78,8 @@ int main() {
   edm::InputTag tag3("d", "e", "f");
   if (tag3.label() != "d" ||
       tag3.instance() != "e" ||
-      tag3.process() != "f") {
+      tag3.process() != "f" ||
+      tag3.skipCurrentProcess()) {
     std::cout << "InputTag(char*,char*,char*) failed" << std::endl;
     abort();
   }
@@ -111,7 +87,8 @@ int main() {
   edm::InputTag tag4("g:h:i");
   if (tag4.label() != "g" ||
       tag4.instance() != "h" ||
-      tag4.process() != "i") {
+      tag4.process() != "i" ||
+      tag4.skipCurrentProcess()) {
     std::cout << "InputTag(string) 1 failed" << std::endl;
     abort();
   }
@@ -119,7 +96,8 @@ int main() {
   edm::InputTag tag5("g:h");
   if (tag5.label() != "g" ||
       tag5.instance() != "h" ||
-      tag5.process() != "") {
+      tag5.process() != "" ||
+      tag5.skipCurrentProcess()) {
     std::cout << "InputTag(string) 2 failed" << std::endl;
     abort();
   }
@@ -127,7 +105,8 @@ int main() {
   edm::InputTag tag6("g");
   if (tag6.label() != "g" ||
       tag6.instance() != "" ||
-      tag6.process() != "") {
+      tag6.process() != "" ||
+      tag6.skipCurrentProcess()) {
     std::cout << "InputTag(string) 3 failed" << std::endl;
     abort();
   }
@@ -168,6 +147,37 @@ int main() {
       tag12.process() != "@skipCurrentProcess" ||
       !tag12.skipCurrentProcess()) {
     std::cout << "Test of tag12 failed" << std::endl;
+    abort();
+  }
+
+  edm::InputTag tag12a(std::string("d"), std::string("e"), std::string("@skipCurrentProcess"));
+  if (tag12a.label() != "d" ||
+      tag12a.instance() != "e" ||
+      tag12a.process() != "@skipCurrentProcess" ||
+      !tag12a.skipCurrentProcess()) {
+    std::cout << "Test of tag12a failed" << std::endl;
+    abort();
+  }
+
+  edm::InputTag tag12b("d:e:@skipCurrentProcess");
+  if (tag12b.label() != "d" ||
+      tag12b.instance() != "e" ||
+      tag12b.process() != "@skipCurrentProcess" ||
+      !tag12b.skipCurrentProcess()) {
+    std::cout << "Test of tag12b failed" << std::endl;
+    abort();
+  }
+
+  edm::InputTag tag12c(tag12b);
+  if (!tag12c.skipCurrentProcess()) {
+    std::cout << "Test of tag12c failed" << std::endl;
+    abort();
+  }
+
+  edm::InputTag tag12d;
+  tag12d = tag12a;
+  if (!tag12d.skipCurrentProcess()) {
+    std::cout << "Test of tag12c failed" << std::endl;
     abort();
   }
 
