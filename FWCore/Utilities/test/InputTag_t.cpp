@@ -56,6 +56,32 @@ public:
 };
 
 int main() {
+  std::cout << "sizeof(edm::BranchType) = " << sizeof(edm::BranchType) << std::endl;
+  std::cout << "sizeof(edm::TypeID) = " << sizeof(edm::TypeID) << std::endl;
+  std::cout << "sizeof(std::atomic<unsigned int>) = " << sizeof(std::atomic<unsigned int>) << std::endl;
+
+  struct A {
+    edm::BranchType x;
+    char y;
+  };
+  std::cout << "sizeof(A) = " << sizeof(A) << std::endl;
+
+  struct B {
+    edm::TypeID x;
+    char y;
+  };
+  std::cout << "sizeof(B) = " << sizeof(B) << std::endl;
+
+  struct C {
+    std::atomic<unsigned int> x;
+    char y;
+  };
+  std::cout << "sizeof(C) = " << sizeof(C) << std::endl;
+
+  std::cout << "sizeof(std::string) = " << sizeof(std::string) << std::endl;
+
+  std::cout << "sizeof(edm::InputTag) = " << sizeof(edm::InputTag) << std::endl;
+
   edm::InputTag tag1;
   if (tag1.label() != "" ||
       tag1.instance() != "" ||

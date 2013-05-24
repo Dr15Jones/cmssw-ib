@@ -45,7 +45,7 @@ namespace edm {
     ///product with the label and instance
     std::string const& process() const {return process_;} 
 
-    bool skipCurrentProcess() const;
+    bool skipCurrentProcess() const { return skipCurrentProcess_; }
     
     bool operator==(InputTag const& tag) const;
 
@@ -53,17 +53,28 @@ namespace edm {
 
     void tryToCacheIndex(ProductHolderIndex index, TypeID const& typeID, BranchType branchType, void const* productRegistry) const;
 
+    static const std::string kSkipCurrentProcess;
+
   private:
+
+    bool calcSkipCurrentProcess() const;
+
     std::string label_;
     std::string instance_;
     std::string process_;
 
-#ifndef __GCCXML__
-    mutable std::atomic<unsigned int> index_;
-#endif
-    mutable BranchType branchType_;
     mutable TypeID typeID_;
     mutable void const* productRegistry_;
+
+#ifndef __GCCXML__
+    mutable std::atomic<unsigned int> index_;
+#else
+    unsigned int index_;
+#endif
+
+    mutable char branchType_;
+
+    bool skipCurrentProcess_;
   };
 
   std::ostream& operator<<(std::ostream& ost, InputTag const& tag);
