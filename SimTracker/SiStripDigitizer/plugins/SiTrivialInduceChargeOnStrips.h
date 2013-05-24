@@ -12,25 +12,33 @@ class SiTrivialInduceChargeOnStrips: public SiInduceChargeOnStrips {
   virtual ~SiTrivialInduceChargeOnStrips() {}
   void  induce(const SiChargeCollectionDrifter::collection_type& collection_points,
 	       const StripGeomDetUnit& det,
-	       std::vector<double>& localAmplitudes,
+	       std::vector<float>& localAmplitudes,
 	       size_t& recordMinAffectedStrip,
 	       size_t& recordMaxAffectedStrip,
 	       const TrackerTopology *tTopo) const;
   
  private:
-  double chargeDeposited(size_t strip, 
-			 size_t Nstrips, 
-			 double amplitude, 
-			 double chargeSpread, 
-			 double chargePosition) const;
-  static unsigned int typeOf(const StripGeomDetUnit&, const TrackerTopology *tTopo);
-  static unsigned int indexOf(const std::string&);
-  static const std::string type[];
-  static const int Ntypes;
-  const std::vector<std::vector<double> > signalCoupling; 
+
+  void  induceOriginal(const SiChargeCollectionDrifter::collection_type& collection_points,
+		  const StripGeomDetUnit& det,
+		  std::vector<float>& localAmplitudes,
+		  size_t& recordMinAffectedStrip,
+		  size_t& recordMaxAffectedStrip,
+		  const TrackerTopology *tTopo) const;
+ 
+
+  void  induceVector(const SiChargeCollectionDrifter::collection_type& collection_points,
+		     const StripGeomDetUnit& det,
+		     std::vector<float>& localAmplitudes,
+		     size_t& recordMinAffectedStrip,
+		     size_t& recordMaxAffectedStrip,
+		     const TrackerTopology *tTopo) const;
+
+
+  const std::vector<std::vector<float> > signalCoupling; 
   
-  const double Nsigma;
-  const double geVperElectron;
+  const float Nsigma;
+  const float geVperElectron;
 };
 
 #endif
