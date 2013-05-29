@@ -71,7 +71,7 @@ HcalGeometry::fillDetIds() const
    std::sort( m_heIds.begin(), m_heIds.end() ) ;
    std::sort( m_hoIds.begin(), m_hoIds.end() ) ;
    std::sort( m_hfIds.begin(), m_hfIds.end() ) ;
-
+       
    m_emptyIds.resize( 0 ) ;
 }
 
@@ -462,11 +462,10 @@ HcalGeometry::newCell( const GlobalPoint& f1 ,
   const HcalDetId hid ( detId ) ;
   unsigned int din=theTopology.detId2denseId(detId);
 
-  static int counter=0;
-  edm::LogInfo("HcalGeometry") << counter++ << ": newCell subdet "
-			       << detId.subdetId() << ", raw ID " 
-			       << detId.rawId() << ", hid " << hid << ", din " 
-			       << din;
+  edm::LogInfo("HcalGeometry") << " newCell subdet "
+ 	    << detId.subdetId() << ", raw ID " 
+ 	    << detId.rawId() << ", hid " << hid << ", din " 
+ 	    << din << ", index ";
   
   if( hid.subdet()==HcalBarrel) {
     m_hbCellVec[ din ] = IdealObliquePrism( f1, cornersMgr(), parm ) ;
@@ -491,7 +490,7 @@ HcalGeometry::newCell( const GlobalPoint& f1 ,
 }
 
 const CaloCellGeometry* 
-HcalGeometry::cellGeomPtr( uint32_t din ) const
+HcalGeometry::cellGeomPtr( unsigned int din ) const
 {
    const CaloCellGeometry* cell ( 0 ) ;
    if( m_hbCellVec.size() > din )
@@ -541,15 +540,12 @@ void
 HcalGeometry::getSummary( CaloSubdetectorGeometry::TrVec&  tVec,
 			  CaloSubdetectorGeometry::IVec&   iVec,
 			  CaloSubdetectorGeometry::DimVec& dVec,
-			  std::vector<uint32_t>& dins ) const
+			  CaloSubdetectorGeometry::IVec& dinsVec ) const
 {
-   tVec.reserve( m_validIds.size()*numberOfTransformParms() ) ;
-   iVec.reserve( numberOfShapes()==1 ? 1 : m_validIds.size() ) ;
+   tVec.reserve( theTopology.ncells()*numberOfTransformParms() ) ;
+   iVec.reserve( numberOfShapes()==1 ? 1 : theTopology.ncells() ) ;
    dVec.reserve( numberOfShapes()*numberOfParametersPerShape() ) ;
-   dins = m_dins;
-
-   std::cout << "HcalGeometry::m_dins size " << m_dins.size() << std::endl;
-   std::cout << "Filled dins size " << dins.size() << ", m_validIds.size() " << m_validIds.size() << std::endl;
+   dinsVec.reserve( m_dins.size() );
    
    for( ParVecVec::const_iterator ivv ( parVecVec().begin() ) ; ivv != parVecVec().end() ; ++ivv )
    {
@@ -560,10 +556,12 @@ HcalGeometry::getSummary( CaloSubdetectorGeometry::TrVec&  tVec,
       }
    }
 
-   for( uint32_t i ( 0 ) ; i != m_validIds.size() ; ++i )
+   for( unsigned int i ( 0 ) ; i < theTopology.ncells() ; ++i )
    {
       Tr3D tr ;
-      const CaloCellGeometry* ptr ( cellGeomPtr( dins[i] ) ) ;
+      const CaloCellGeometry* ptr ( cellGeomPtr( i ) ) ;
+      dinsVec.push_back( i );
+      
       assert( 0 != ptr ) ;
       ptr->getTransform( tr, ( Pt3DVec* ) 0 ) ;
 
@@ -609,8 +607,7 @@ HcalGeometry::getSummary( CaloSubdetectorGeometry::TrVec&  tVec,
       }
       assert( 9999 != ishape ) ;
 
-      const unsigned int nn (( numberOfShapes()==1) ? (unsigned int)1 : m_validIds.size() ) ; 
+      const unsigned int nn (( numberOfShapes()==1) ? (unsigned int)1 : m_dins.size() ) ; 
       if( iVec.size() < nn ) iVec.push_back( ishape ) ;
    }
 }
-

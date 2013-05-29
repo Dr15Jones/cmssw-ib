@@ -78,7 +78,16 @@ PFBlockProducer::PFBlockProducer(const edm::ParameterSet& iConfig) {
   
   if(useEGPhotons_) {
     inputTagEGPhotons_
-      = iConfig.getParameter<InputTag>("EGPhotons");
+      = iConfig.getParameter<InputTag>("EGPhotons");         
+  }
+  
+  useSuperClusters_ = iConfig.existsAs<bool>("useSuperClusters") ? iConfig.getParameter<bool>("useSuperClusters") : false;
+  
+  if (useSuperClusters_) {
+    inputTagSCBarrel_
+      = iConfig.getParameter<InputTag>("SCBarrel");      
+    inputTagSCEndcap_
+      = iConfig.getParameter<InputTag>("SCEndcap");     
   }
 
   verbose_ = 
@@ -155,7 +164,9 @@ PFBlockProducer::PFBlockProducer(const edm::ParameterSet& iConfig) {
 			      useIterTracking,
 			      nuclearInteractionsPurity,
 			      useEGPhotons_,
-			      EGPhotonSelectionCuts );
+			      EGPhotonSelectionCuts,
+			      useSuperClusters_
+			    );
   
   pfBlockAlgo_.setDebug(debug_);
 
@@ -325,6 +336,28 @@ PFBlockProducer::produce(Event& iEvent,
   if(!found && useEGPhotons_ )
     LogError("PFBlockProducer")<<" cannot get photons" 
 			       << inputTagEGPhotons_ << endl;
+			       
+  Handle< reco::SuperClusterCollection >  sceb;
+  Handle< reco::SuperClusterCollection >  scee;
+  
+  if (useSuperClusters_) {
+    found = iEvent.getByLabel(inputTagSCBarrel_,
+			      sceb);
+
+    if(!found)
+      LogError("PFBlockProducer")<<" cannot get sceb" 
+				<< inputTagSCBarrel_ << endl;
+	  
+				
+    
+    found = iEvent.getByLabel(inputTagSCEndcap_,
+			      scee);
+
+    if(!found)
+      LogError("PFBlockProducer")<<" cannot get scee" 
+				<< inputTagSCEndcap_ << endl;				       
+								
+  }
 
   if( usePFatHLT_  ) {
      pfBlockAlgo_.setInput( recTracks, 		
@@ -350,7 +383,9 @@ PFBlockProducer::produce(Event& iEvent,
 			   clustersHFEM,
 			   clustersHFHAD,
 			   clustersPS,
-			   egPhotons);
+			   egPhotons,
+			   sceb,
+			   scee);
   }
   pfBlockAlgo_.findBlocks();
   

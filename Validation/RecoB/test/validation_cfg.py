@@ -7,7 +7,7 @@ import FWCore.ParameterSet.VarParsing as VarParsing
 options = VarParsing.VarParsing ('analysis')
 
 options.register ('jets',
-                  "ak5PF", # default value, allowed : "ak5PF", "ak5PFJEC", "ak5PFnoPU"
+                  "ak5PF", # default value, allowed : "ak5PF", "ak5PFJEC", ak5PFJECL1", "ak5PFnoPU"
                   VarParsing.VarParsing.multiplicity.singleton,
                   VarParsing.VarParsing.varType.string,  
                   "jet collection to use")
@@ -44,7 +44,7 @@ process.GlobalTag.globaltag = tag
 process.load("DQMServices.Core.DQM_cfg")
 
 process.load("DQMOffline.RecoB.bTagSequences_cff")
-#bTagHLT.HLTPaths = ["HLT_PFJet80_v*"] #uncomment this line if you want to use different trigger
+#process.bTagHLT.HLTPaths = ["HLT_PFJet80_v*"] #uncomment this line if you want to use different trigger
 
 if whichJets=="ak5PFnoPU":
     process.out = cms.OutputModule("PoolOutputModule",
@@ -62,14 +62,18 @@ if whichJets=="ak5PFnoPU":
     process.selectedPatJetsPF2PAT.cut = JetCut
     process.JECAlgo = cms.Sequence( getattr(process,"patPF2PATSequence"+postfix) )
     newjetID=cms.InputTag("selectedPatJetsPF2PAT")
-elif whichJets=="ak5PFJEC":
+elif whichJets=="ak5PFJEC" or whichJets=="ak5PFJECL1":
+    if whichJets=="ak5PFJECL1":
+        if not runOnMC : process.ak5PFJetsJEC.correctors = ['ak5PFL1FastL2L3Residual']
+        else : process.ak5PFJetsJEC.correctors = ['ak5PFL1FastL2L3']
+        process.PFJetsFilter.src = cms.InputTag("ak5PFJetsJEC")
     process.JECAlgo = cms.Sequence(process.ak5PFJetsJEC * process.PFJetsFilter)
     newjetID=cms.InputTag("PFJetsFilter")
 
 if not whichJets=="ak5PF":
     process.myak5JetTracksAssociatorAtVertex.jets = newjetID
-    process.softMuonTagInfos.jets                 = newjetID
-    process.softElectronTagInfos.jets             = newjetID
+    process.softPFMuonsTagInfos.jets             = newjetID
+    process.softPFElectronsTagInfos.jets          = newjetID
     process.AK5byRef.jets                         = newjetID
 
 ###
@@ -116,6 +120,6 @@ process.dqmSaver.saveByRun = cms.untracked.int32(-1)
 process.dqmSaver.saveAtJobEnd =cms.untracked.bool(True) 
 process.dqmSaver.forceRunNumber = cms.untracked.int32(1)
 process.PoolSource.fileNames = [
-    
+
 ]
 

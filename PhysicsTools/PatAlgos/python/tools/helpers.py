@@ -1,37 +1,89 @@
 import FWCore.ParameterSet.Config as cms
+import sys
 
 ## Helpers to perform some technically boring tasks like looking for all modules with a given parameter
 ## and replacing that to a given value
+def loadWithPostfix(process,moduleName,postfix=''):
+	moduleName = moduleName.replace("/",".")
+        module = __import__(moduleName)
+	#print module.PatAlgos.patSequences_cff.patDefaultSequence
+        extendWithPostfix(process,sys.modules[moduleName],postfix)
+
+def extendWithPostfix(process,other,postfix,items=()):
+        """Look in other and find types which we can use"""
+        # enable explicit check to avoid overwriting of existing objects
+        #__dict__['_Process__InExtendCall'] = True
+
+        seqs = dict()
+	sequence = cms.Sequence()
+	sequence._moduleLabels = []
+	sequence.setLabel('tempSequence')
+        for name in dir(other):
+            #'from XX import *' ignores these, and so should we.
+            	if name.startswith('_'):
+                	continue
+            	item = getattr(other,name)
+            	if name == "source" or name == "looper" or name == "subProcess":
+			continue
+
+            	elif isinstance(item,cms._ModuleSequenceType):
+
+			continue
+            	elif isinstance(item,cms._Labelable):
+                	if not item.hasLabel_():
+                   		item.setLabel(name)
+			if postfix != '':
+				newModule = item.clone()
+
+				#if 'ESProducer' in name or isinstance(item,ESProducer):
+				if isinstance(item,cms.ESProducer):
+
+					newLabel = item.label()
+					newName =name
+				else:
+				        if 'TauDiscrimination' in name:
+				                       process.__setattr__(name,item)
+					newLabel = item.label()+postfix
+					newName = name+postfix
+				process.__setattr__(newName,newModule)
+				if isinstance(newModule, cms._Sequenceable) and not newName == name:
+					sequence +=getattr(process,newName)
+					sequence._moduleLabels.append(item.label())
+			else:
+				process.__setattr__(name,item)
+
+
+            	elif isinstance(item,cms.Schedule):
+			continue
+
+
+	if postfix != '':
+		for label in sequence._moduleLabels:
+			massSearchReplaceAnyInputTag(sequence, label, label+postfix,verbose=False,moduleLabelOnly=True)
 
 def applyPostfix(process, label, postfix):
-    ''' If a module is in patDefaultSequence use the cloned module.
-    Will crash if patDefaultSequence has not been cloned with 'postfix' beforehand'''
-    result = None 
-    defaultLabels = __labelsInSequence(process, "patDefaultSequence", postfix)
-    if hasattr(process, "patPF2PATSequence"):
-        defaultLabels = __labelsInSequence(process, "patPF2PATSequence", postfix)
-    if label in defaultLabels and hasattr(process, label+postfix):
-        result = getattr(process, label+postfix)
-    elif hasattr(process, label):
-        print "WARNING: called applyPostfix for module/sequence %s which is not in patDefaultSequence%s!"%(label,postfix)
-        result = getattr(process, label)    
+    result = None
+    if hasattr(process, label+postfix):
+        result = getattr(process, label + postfix)
+    else:
+        raise ValueError("Error in <applyPostfix>: No module of name = %s attached to process !!" % (label + postfix))
     return result
 
 def removeIfInSequence(process, target,  sequenceLabel, postfix=""):
     labels = __labelsInSequence(process, sequenceLabel, postfix)
-    if target+postfix in labels: 
+    if target+postfix in labels:
         getattr(process, sequenceLabel+postfix).remove(
             getattr(process, target+postfix)
             )
-    
+
 def __labelsInSequence(process, sequenceLabel, postfix=""):
     result = [ m.label()[:-len(postfix)] for m in listModules( getattr(process,sequenceLabel+postfix))]
     result.extend([ m.label()[:-len(postfix)] for m in listSequences( getattr(process,sequenceLabel+postfix))]  )
-    if postfix == "":  
+    if postfix == "":
         result = [ m.label() for m in listModules( getattr(process,sequenceLabel+postfix))]
         result.extend([ m.label() for m in listSequences( getattr(process,sequenceLabel+postfix))]  )
     return result
-    
+
 class MassSearchReplaceParamVisitor(object):
     """Visitor that travels within a cms.Sequence, looks for a parameter and replaces its value"""
     def __init__(self,paramName,paramSearch,paramValue,verbose=False):
@@ -61,14 +113,14 @@ class MassSearchReplaceAnyInputTagVisitor(object):
             for name in pset.parameters_().keys():
                 # if I use pset.parameters_().items() I get copies of the parameter values
                 # so I can't modify the nested pset
-                value = getattr(pset,name) 
+                value = getattr(pset,name)
                 type = value.pythonTypeName()
-                if type == 'cms.PSet':  
+                if type == 'cms.PSet':
                     self.doIt(value,base+"."+name)
                 elif type == 'cms.VPSet':
                     for (i,ps) in enumerate(value): self.doIt(ps, "%s.%s[%d]"%(base,name,i) )
                 elif type == 'cms.VInputTag':
-                    for (i,n) in enumerate(value): 
+                    for (i,n) in enumerate(value):
                          # VInputTag can be declared as a list of strings, so ensure that n is formatted correctly
                          n = self.standardizeInputTagFmt(n)
                          if (n == self._paramSearch):
@@ -94,9 +146,9 @@ class MassSearchReplaceAnyInputTagVisitor(object):
                         repl.moduleLabel = self._paramReplace.moduleLabel
                         setattr(pset, name, repl)
                         if self._verbose:print "Replace %s.%s %s ==> %s " % (base, name, value, repl)
-                        
 
-    @staticmethod 
+
+    @staticmethod
     def standardizeInputTagFmt(inputTag):
        ''' helper function to ensure that the InputTag is defined as cms.InputTag(str) and not as a plain str '''
        if not isinstance(inputTag, cms.InputTag):
@@ -143,7 +195,7 @@ class CloneSequenceVisitor(object):
             if label in self._moduleLabels: # has the module already been cloned ?
                 newModule = getattr(self._process, self._newLabel(label))
             else:
-                self._moduleLabels.append(label)                
+                self._moduleLabels.append(label)
                 newModule = visitee.clone()
                 setattr(self._process, self._newLabel(label), newModule)
             self.__appendToTopSequence(newModule)
@@ -167,7 +219,7 @@ class CloneSequenceVisitor(object):
 
     def __appendToTopSequence(self, visitee):
         self._clonedSequence += visitee
-        
+
 class MassSearchParamVisitor(object):
     """Visitor that travels within a cms.Sequence, looks for a parameter and returns a list of modules that have it"""
     def __init__(self,paramName,paramSearch):
@@ -182,8 +234,8 @@ class MassSearchParamVisitor(object):
         pass
     def modules(self):
         return self._modules
-    
-    
+
+
 def massSearchReplaceParam(sequence,paramName,paramOldValue,paramValue,verbose=False):
     sequence.visit(MassSearchReplaceParamVisitor(paramName,paramOldValue,paramValue,verbose))
 
@@ -197,10 +249,10 @@ def listSequences(sequence):
     sequence.visit(visitor)
     return visitor.modules()
 
-def massSearchReplaceAnyInputTag(sequence, oldInputTag, newInputTag,verbose=False,moduleLabelOnly=False) : 
+def massSearchReplaceAnyInputTag(sequence, oldInputTag, newInputTag,verbose=False,moduleLabelOnly=False) :
     """Replace InputTag oldInputTag with newInputTag, at any level of nesting within PSets, VPSets, VInputTags..."""
     sequence.visit(MassSearchReplaceAnyInputTagVisitor(oldInputTag,newInputTag,verbose=verbose,moduleLabelOnly=moduleLabelOnly))
-    
+
 def jetCollectionString(prefix='', algo='', type=''):
     """
     ------------------------------------------------------------------
@@ -213,14 +265,14 @@ def jetCollectionString(prefix='', algo='', type=''):
              ted are 'Calo', 'PFlow', 'JPT', ...]
     prefix : prefix indicating the type of pat collection module (ex-
              pected are '', 'selected', 'clean').
-    ------------------------------------------------------------------    
+    ------------------------------------------------------------------
     """
     if(prefix==''):
         jetCollectionString ='pat'
     else:
         jetCollectionString =prefix
         jetCollectionString+='Pat'
-    jetCollectionString+='Jets'        
+    jetCollectionString+='Jets'
     jetCollectionString+=algo
     jetCollectionString+=type
     return jetCollectionString
@@ -228,23 +280,23 @@ def jetCollectionString(prefix='', algo='', type=''):
 def contains(sequence, moduleName):
     """
     ------------------------------------------------------------------
-    return True if a module with name 'module' is contained in the 
+    return True if a module with name 'module' is contained in the
     sequence with name 'sequence' and False otherwise. This version
     is not so nice as it also returns True for any substr of the name
     of a contained module.
 
     sequence : sequence [e.g. process.patDefaultSequence]
     module   : module name as a string
-    ------------------------------------------------------------------    
+    ------------------------------------------------------------------
     """
-    return not sequence.__str__().find(moduleName)==-1    
+    return not sequence.__str__().find(moduleName)==-1
 
 
 
 def cloneProcessingSnippet(process, sequence, postfix, removePostfix=""):
    """
    ------------------------------------------------------------------
-   copy a sequence plus the modules and sequences therein 
+   copy a sequence plus the modules and sequences therein
    both are renamed by getting a postfix
    input tags are automatically adjusted
    ------------------------------------------------------------------
@@ -253,7 +305,7 @@ def cloneProcessingSnippet(process, sequence, postfix, removePostfix=""):
    if not postfix == "":
        visitor = CloneSequenceVisitor(process, sequence.label(), postfix, removePostfix)
        sequence.visit(visitor)
-       result = visitor.clonedSequence()    
+       result = visitor.clonedSequence()
    return result
 
 if __name__=="__main__":
@@ -300,5 +352,5 @@ if __name__=="__main__":
            massSearchReplaceParam(p.s,"src",cms.InputTag("b"),"a")
            self.assertEqual(cms.InputTag("a"),p.c.src)
            self.assertNotEqual(cms.InputTag("a"),p.c.nested.src)
-           
+
    unittest.main()

@@ -185,9 +185,11 @@ from RecoEgamma.EgammaHFProducers.hfEMClusteringSequence_cff import *
 from RecoEgamma.EgammaElectronProducers.ecalDrivenElectronSeeds_cfi import *
 from FastSimulation.EgammaElectronAlgos.electronGSGsfTrackCandidates_cff import *
 from RecoEgamma.EgammaElectronProducers.gsfElectronSequence_cff import *
+from RecoEgamma.EgammaElectronProducers.gedGsfElectronSequence_cff import *
 from TrackingTools.GsfTracking.GsfElectronFit_cff import *
 from RecoEgamma.EgammaPhotonProducers.conversionTrackSequence_cff import *
 from RecoEgamma.EgammaPhotonProducers.allConversionSequence_cff import *
+from RecoEgamma.EgammaPhotonProducers.gedPhotonSequence_cff import *
 from RecoEgamma.Configuration.RecoEgamma_cff import egammaHighLevelRecoPostPF
 allConversions.src = 'gsfGeneralConversionTrackMerger'
 famosConversionSequence = cms.Sequence(conversionTrackSequenceNoEcalSeeded*allConversionSequence)
@@ -376,10 +378,10 @@ elif(CaloMode==3):
         )
     famosSimulationSequence = cms.Sequence( # valid for both MixingMode values
         simulationSequence+
-        digitizationSequence+ # temporary; eventually it will be a block of its own, but it requires intervention on ConfigBuilder
+        digitizationSequence#+ # temporary; eventually it will be a block of its own, but it requires intervention on ConfigBuilder
         # Note: of course it is a bit odd that the next two sequences are made part of the SIM step, but this is a temporary solution needed because currently HLT is run before reconstructionWithFamos, and HLT needs to access the caloRecHits, which in turn depend on tracks because HCAL hits use the TrackExtrapolator
-        trackVertexReco+
-        caloTowersSequence
+#        trackVertexReco+
+#        caloTowersSequence
         )
 
 
@@ -648,9 +650,9 @@ simulationNoMuonDigiWithFamos = cms.Sequence(
 
 # The simulation and digitization sequence
 simulationWithFamos = cms.Sequence(
-    famosSimulationSequence+
-    muonDigi+
-    siTrackerGaussianSmearingRecHits
+    famosSimulationSequence#+
+#    muonDigi+
+#    siTrackerGaussianSmearingRecHits
 )
 
 

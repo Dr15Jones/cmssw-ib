@@ -1,8 +1,8 @@
 /** \file LaserAlignment.cc
  *  LAS reconstruction module
  *
- *  $Date: 2013/01/07 20:26:37 $
- *  $Revision: 1.47 $
+ *  $Date: 2013/05/25 14:31:03 $
+ *  $Revision: 1.48 $
  *  \author Maarten Thomas
  *  \author Jan Olzem
  */
@@ -465,7 +465,7 @@ void LaserAlignment::produce(edm::Event& theEvent, edm::EventSetup const& theSet
 ///
 ///
 ///
-void LaserAlignment::endRun( edm::Run& theRun, const edm::EventSetup& theSetup ) {
+void LaserAlignment::endRunProduce( edm::Run& theRun, const edm::EventSetup& theSetup ) {
 
 
   std::cout << " [LaserAlignment::endRun] -- Total number of events processed: " << theEvents << std::endl;

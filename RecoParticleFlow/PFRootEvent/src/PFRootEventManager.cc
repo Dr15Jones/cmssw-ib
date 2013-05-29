@@ -1080,7 +1080,9 @@ void PFRootEventManager::readOptions(const char* file,
 				useConvBremPFRecTracks_,
 				nuclearInteractionsPurity,
 				useEGPhotons_,
-				PhotonSelectionCuts); 
+				PhotonSelectionCuts,
+				false
+			      ); 
   }  
   catch( std::exception& err ) {
     cerr<<"exception setting PFBlockAlgo parameters: "
@@ -3139,6 +3141,10 @@ void PFRootEventManager::particleFlow() {
 
   edm::OrphanHandle< reco::PhotonCollection > photonh( &photons_, edm::ProductID(12) ) ;
   
+  edm::OrphanHandle< reco::SuperClusterCollection > ebsch( &ebsc_, edm::ProductID(12) ) ;
+  edm::OrphanHandle< reco::SuperClusterCollection > eesch( &eesc_, edm::ProductID(12) ) ;
+  
+  
   vector<bool> trackMask;
   fillTrackMask( trackMask, recTracks_ );
   vector<bool> gsftrackMask;
@@ -3148,6 +3154,7 @@ void PFRootEventManager::particleFlow() {
   vector<bool> hcalMask;
   fillClusterMask( hcalMask, *clustersHCAL_ );
 
+  vector<bool> scmask;
 
   vector<bool> hoMask;
   if (useHO_) {fillClusterMask( hoMask, *clustersHO_ );}
@@ -3165,8 +3172,8 @@ void PFRootEventManager::particleFlow() {
     pfBlockAlgo_.setInput( trackh, gsftrackh, convBremGsftrackh,
 			   muonh, nuclearh, displacedtrackh, convh, v0,
 			   ecalh, hcalh, hoh, hfemh, hfhadh, psh, 
-			   photonh, trackMask,gsftrackMask, 
-			   ecalMask, hcalMask, hoMask, hfemMask, hfhadMask, psMask,photonMask );
+			   photonh, ebsch, eesch, trackMask,gsftrackMask, 
+			   ecalMask, hcalMask, hoMask, hfemMask, hfhadMask, psMask,photonMask,scmask );
   else    
     pfBlockAlgo_.setInput( trackh, muonh, ecalh, hcalh, hfemh, hfhadh, psh, hoh,
 			   trackMask, ecalMask, hcalMask, hoMask, psMask);
