@@ -395,9 +395,9 @@ class EventRange(_ParameterTypeBase):
         parameterSet.addEventRange(self.isTracked(), myname, self.cppID(parameterSet))
 
 class InputTag(_ParameterTypeBase):
-    def __init__(self,moduleLabel,productInstanceLabel='',processName='',skipCurrentProcess=False):
+    def __init__(self,moduleLabel,productInstanceLabel='',processName=''):
         super(InputTag,self).__init__()
-        self._setValues(moduleLabel, productInstanceLabel, processName,skipCurrentProcess)
+        self._setValues(moduleLabel, productInstanceLabel, processName)
     def getModuleLabel(self):
         return self.__moduleLabel
     def setModuleLabel(self,label):
@@ -419,6 +419,12 @@ class InputTag(_ParameterTypeBase):
             self.__processName = label
             self._isModified=True
     processName = property(getProcessName,setProcessName,"process name for the product")
+    @staticmethod
+    def skipCurrentProcess():
+        """When used as the process name this value will make the framework skip the current process
+            when looking backwards in time for the data product.
+        """
+        return "@skipCurrentProcess"
     def configValue(self, options=PrintOptions()):
         result = self.__moduleLabel
         if self.__productInstance != "" or self.__processName != "":
@@ -459,7 +465,7 @@ class InputTag(_ParameterTypeBase):
     def setValue(self,v):
         self._setValues(v)
         self._isModified=True
-    def _setValues(self,moduleLabel,productInstanceLabel='',processName='',skipCurrentProcess=False):
+    def _setValues(self,moduleLabel,productInstanceLabel='',processName=''):
         self.__moduleLabel = moduleLabel
         self.__productInstance = productInstanceLabel
         self.__processName=processName
@@ -471,11 +477,6 @@ class InputTag(_ParameterTypeBase):
                 self.__productInstance = toks[1]
             if len(toks) > 2:
                 self.__processName=toks[2]
-        if skipCurrentProcess:
-            if self.__processName != "":
-                raise RuntimeError("In the arguments to an InputTag it is illegal to specify\nboth a nonempty process name and set skipCurrentProcess to True\n  module label = '"+str(self.__moduleLabel)+"'\n  instance = '"+str(self.__productInstance)+"'\n  process = '"+str(self.__processName)+"'")
-            self.__processName = "@skipCurrentProcess"
-
     # convert to the wrapper class for C++ InputTags
     def cppTag(self, parameterSet):
         return parameterSet.newInputTag(self.getModuleLabel(),

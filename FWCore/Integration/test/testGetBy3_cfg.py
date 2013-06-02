@@ -46,7 +46,7 @@ process.a1 = cms.EDAnalyzer("TestFindProduct",
 )
 
 process.a2 = cms.EDAnalyzer("TestFindProduct",
-  inputTags = cms.untracked.VInputTag( cms.InputTag("intProducer", skipCurrentProcess = True) ),
+  inputTags = cms.untracked.VInputTag( cms.InputTag("intProducer", process=cms.InputTag.skipCurrentProcess()) ),
   expectedSum = cms.untracked.int32(6)
 )
 
@@ -71,7 +71,7 @@ process.a10 = cms.EDAnalyzer("TestFindProduct",
 )
 
 process.a20 = cms.EDAnalyzer("TestFindProduct",
-  inputTags = cms.untracked.VInputTag( cms.InputTag("intProducerU", skipCurrentProcess = True) ),
+  inputTags = cms.untracked.VInputTag( cms.InputTag("intProducerU", process=cms.InputTag.skipCurrentProcess()) ),
   expectedSum = cms.untracked.int32(60)
 )
 
@@ -91,7 +91,7 @@ process.a50 = cms.EDAnalyzer("TestFindProduct",
 )
 
 process.a100 = cms.EDAnalyzer("TestFindProduct",
-  inputTags = cms.untracked.VInputTag( cms.InputTag("source", skipCurrentProcess = True) ),
+  inputTags = cms.untracked.VInputTag( cms.InputTag("source", process=cms.InputTag.skipCurrentProcess()) ),
   expectedSum = cms.untracked.int32(12)
 )
 
@@ -106,10 +106,10 @@ process.a300 = cms.EDAnalyzer("TestFindProduct",
 )
 
 process.a400 = cms.EDAnalyzer("TestFindProduct",
-  inputTags = cms.untracked.VInputTag( cms.InputTag("aliasForInt", skipCurrentProcess = True) ),
+  inputTags = cms.untracked.VInputTag( cms.InputTag("aliasForInt", process=cms.InputTag.skipCurrentProcess()) ),
   expectedSum = cms.untracked.int32(300),
   inputTagsNotFound = cms.untracked.VInputTag(
-    cms.InputTag("intProducerA", skipCurrentProcess = True)
+    cms.InputTag("intProducerA", process=cms.InputTag.skipCurrentProcess())
   )
 )
 
@@ -147,7 +147,7 @@ process.a1004 = cms.EDAnalyzer("TestFindProduct",
 
 process.a1005 = cms.EDAnalyzer("TestFindProduct",
   inputTags = cms.untracked.VInputTag(),
-  inputTagsView = cms.untracked.VInputTag( cms.InputTag("intVectorProducer", skipCurrentProcess = True) ),
+  inputTagsView = cms.untracked.VInputTag( cms.InputTag("intVectorProducer", process=cms.InputTag.skipCurrentProcess()) ),
   expectedSum = cms.untracked.int32(63)
 )
 
