@@ -45,7 +45,7 @@ namespace edm {
 
     // ---------- const member functions ---------------------
     unsigned int index() const {return m_value & s_indexMask;}
-    bool skipCurrentProcess() const { return 0 != (m_value & s_skipMask); }
+    bool willSkipCurrentProcess() const { return 0 != (m_value & s_skipMask); }
     bool isUnitialized() const { return m_value == s_uninitializedValue; }
 
   private:
@@ -72,7 +72,7 @@ namespace edm {
   
     // ---------- const member functions ---------------------
     unsigned int index() const {return m_value & s_indexMask;}
-    bool skipCurrentProcess() const { return 0 != (m_value & s_skipMask); }
+    bool willSkipCurrentProcess() const { return 0 != (m_value & s_skipMask); }
     bool isUnitialized() const { return m_value == s_uninitializedValue; }
 
   private:

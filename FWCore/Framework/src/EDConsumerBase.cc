@@ -76,7 +76,7 @@ EDConsumerBase::recordConsumes(BranchType iBranch, TypeToGet const& iType, edm::
                            LabelPlacement{labelStart,delta1,delta2},
                            iType.kind());
 
-  bool skipCurrentProcess = iTag.skipCurrentProcess();
+  bool skipCurrentProcess = iTag.willSkipCurrentProcess();
 
   const size_t additionalSize =
       skipCurrentProcess ?
