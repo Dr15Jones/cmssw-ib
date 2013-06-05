@@ -61,6 +61,11 @@ namespace edm {
     emptyPSet.registerIt();
     processConfiguration_->setParameterSetID(emptyPSet.id());
 
+    if(pset.existsAs<std::vector<ParameterSet> >("producers", true)) {
+      std::vector<ParameterSet> producers = pset.getParameter<std::vector<ParameterSet> >("producers");
+      provider_.reset(new XXX(producers, *productRegistry_, ActionTable(), processConfiguration_));
+    }
+
     input_->productRegistry()->setFrozen();
 
     // A modified HistoryAppender must be used for unscheduled processing.
@@ -68,11 +73,6 @@ namespace edm {
                                        input_->branchIDListHelper(),
                                        *processConfiguration_,
                                        nullptr));
-
-    if(pset.existsAs<std::vector<ParameterSet> >("producers", true)) {
-      std::vector<ParameterSet> producers = pset.getParameter<std::vector<ParameterSet> >("producers");
-      provider_.reset(new XXX(producers, *productRegistry_, ActionTable(), processConfiguration_));
-    }
 
     if (pset.exists("nbPileupEvents")) {
        seed_=pset.getParameter<edm::ParameterSet>("nbPileupEvents").getUntrackedParameter<int>("seed",0);
@@ -181,6 +181,7 @@ namespace edm {
     if (provider_.get() != nullptr) {
       boost::shared_ptr<LuminosityBlockAuxiliary> aux(new LuminosityBlockAuxiliary(lumi.luminosityBlockAuxiliary()));
       lumiPrincipal_.reset(new LuminosityBlockPrincipal(aux, productRegistry_, *processConfiguration_, nullptr));
+      lumiPrincipal_->setRunPrincipal(runPrincipal_);
       provider_->beginLuminosityBlock(*lumiPrincipal_, setup);
     }
   }
