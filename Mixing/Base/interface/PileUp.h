@@ -98,7 +98,7 @@ namespace edm {
     boost::shared_ptr<ProcessConfiguration> processConfiguration_;
     std::unique_ptr<EventPrincipal> eventPrincipal_;
     boost::shared_ptr<LuminosityBlockPrincipal> lumiPrincipal_;
-    std::unique_ptr<RunPrincipal> runPrincipal_;
+    boost::shared_ptr<RunPrincipal> runPrincipal_;
     std::unique_ptr<XXX> provider_;
     std::unique_ptr<CLHEP::RandPoissonQ> poissonDistribution_;
     std::unique_ptr<CLHEP::RandPoisson>  poissonDistr_OOT_;
