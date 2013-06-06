@@ -47,8 +47,6 @@ namespace edm {
     all_workers_(),
     unscheduled_(new UnscheduledCallProducer) {
 
-    std::cerr << "BARF # PSets " << psets.size() << std::endl; 
-
     std::vector<std::string> unusedLabels;
     std::set<std::string> unscheduledLabels;
     for (auto& pset : psets) {
