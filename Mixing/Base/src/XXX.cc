@@ -50,7 +50,7 @@ namespace edm {
     std::vector<std::string> unusedLabels;
     std::set<std::string> unscheduledLabels;
     for (auto& pset : psets) {
-	std::cerr << pset.dump() << std::endl;
+	// std::cerr << pset.dump() << std::endl;
 
         std::string label = pset.getParameter<std::string>("@module_label");
         unusedLabels.push_back(label);
