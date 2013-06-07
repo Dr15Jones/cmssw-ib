@@ -1,9 +1,27 @@
 import FWCore.ParameterSet.Config as cms
 from SimCalorimetry.HcalSimProducers.hcalUnsuppressedDigis_cfi import hcalSimBlock
+import EventFilter.EcalRawToDigi.EcalUnpackerData_cfi
+import EventFilter.ESRawToDigi.esRawToDigi_cfi
+import EventFilter.HcalRawToDigi.HcalRawToDigi_cfi
+import EventFilter.DTRawToDigi.dtunpacker_cfi
+import EventFilter.RPCRawToDigi.rpcUnpacker_cfi
+import EventFilter.CSCRawToDigi.cscUnpacker_cfi
+import EventFilter.SiStripRawToDigi.SiStripDigis_cfi
+import EventFilter.SiPixelRawToDigi.SiPixelRawToDigi_cfi
 
 mixData = cms.EDProducer("DataMixingModule",
           hcalSimBlock,
     input = cms.SecSource("PoolSource",
+        producers = cms.VPSet(cms.convertToVPSet(
+                                             ecalEBunpacker = EventFilter.EcalRawToDigi.EcalUnpackerData_cfi.ecalEBunpacker,
+                                             esRawToDigi = EventFilter.ESRawToDigi.esRawToDigi_cfi.esRawToDigi,
+                                             hcalDigis = EventFilter.HcalRawToDigi.HcalRawToDigi_cfi.hcalDigis,
+                                             muonDTDigis = EventFilter.DTRawToDigi.dtunpacker_cfi.muonDTDigis,
+                                             rpcunpacker = EventFilter.RPCRawToDigi.rpcUnpacker_cfi.rpcunpacker,
+                                             muonCSCDigis = EventFilter.CSCRawToDigi.cscUnpacker_cfi.muonCSCDigis,
+                                             siStripDigis = EventFilter.SiStripRawToDigi.SiStripDigis_cfi.siStripDigis,
+                                             siPixelDigis = EventFilter.SiPixelRawToDigi.SiPixelRawToDigi_cfi.siPixelDigis
+                             )),
         nbPileupEvents = cms.PSet(
             averageNumber = cms.double(1.0)
         ),
