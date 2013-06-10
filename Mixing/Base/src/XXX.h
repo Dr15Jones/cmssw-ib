@@ -21,8 +21,6 @@
 namespace edm {
   class XXX {
   public:
-    typedef std::vector<std::string> vstring;
-    typedef boost::shared_ptr<Worker> WorkerPtr;
     typedef std::vector<Worker*> AllWorkers;
 
     typedef std::vector<Worker*> Workers;
