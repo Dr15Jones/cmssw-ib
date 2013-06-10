@@ -5,40 +5,20 @@
 
 */
 
-#include "DataFormats/Provenance/interface/ModuleDescription.h"
-#include "FWCore/Framework/interface/Actions.h"
-#include "FWCore/Framework/interface/EventPrincipal.h"
 #include "FWCore/Framework/interface/ExceptionHelpers.h"
 #include "FWCore/Framework/interface/Frameworkfwd.h"
-#include "FWCore/Framework/interface/OccurrenceTraits.h"
 #include "FWCore/Framework/interface/UnscheduledCallProducer.h"
 #include "FWCore/Framework/src/Worker.h"
 #include "FWCore/Framework/src/WorkerRegistry.h"
-#include "FWCore/MessageLogger/interface/ExceptionMessages.h"
-#include "FWCore/MessageLogger/interface/MessageLogger.h"
-#include "FWCore/ServiceRegistry/interface/Service.h"
-#include "FWCore/Utilities/interface/Algorithms.h"
-#include "FWCore/Utilities/interface/BranchType.h"
 #include "FWCore/Utilities/interface/ConvertException.h"
 #include "FWCore/Utilities/interface/Exception.h"
 
 #include "boost/shared_ptr.hpp"
 
-#include <map>
-#include <memory>
-#include <set>
 #include <string>
 #include <vector>
-#include <sstream>
 
 namespace edm {
-  class ActivityRegistry;
-  class EventSetup;
-  class ExceptionCollector;
-  class OutputWorker;
-  class RunStopwatch;
-  class UnscheduledCallProducer;
-  class WorkerInPath;
   class XXX {
   public:
     typedef std::vector<std::string> vstring;

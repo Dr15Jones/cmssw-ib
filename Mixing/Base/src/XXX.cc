@@ -1,38 +1,8 @@
 #include "Mixing/Base/src/XXX.h"
 
-#include "DataFormats/Provenance/interface/ProcessConfiguration.h"
 #include "DataFormats/Provenance/interface/ProductRegistry.h"
-#include "FWCore/Framework/interface/EDProducer.h"
-#include "FWCore/Framework/interface/OutputModuleDescription.h"
-#include "FWCore/Framework/interface/TriggerNamesService.h"
-#include "FWCore/Framework/interface/TriggerReport.h"
-#include "FWCore/Framework/src/Factory.h"
-#include "FWCore/Framework/interface/OutputModule.h"
-#include "FWCore/Framework/src/OutputWorker.h"
-#include "FWCore/Framework/src/WorkerInPath.h"
-#include "FWCore/Framework/src/WorkerMaker.h"
-#include "FWCore/Framework/src/WorkerT.h"
-#include "FWCore/MessageLogger/interface/MessageLogger.h"
-#include "FWCore/ParameterSet/interface/FillProductRegistryTransients.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
-#include "FWCore/ParameterSet/interface/ParameterSetDescription.h"
-#include "FWCore/ParameterSet/interface/Registry.h"
 #include "FWCore/Utilities/interface/Algorithms.h"
-#include "FWCore/Utilities/interface/ConvertException.h"
-#include "FWCore/Utilities/interface/ExceptionCollector.h"
-#include "FWCore/Utilities/interface/DictionaryTools.h"
-
-#include "boost/bind.hpp"
-#include "boost/ref.hpp"
-
-#include <algorithm>
-#include <cassert>
-#include <cstdlib>
-#include <functional>
-#include <iomanip>
-#include <list>
-#include <map>
-#include <exception>
 
 namespace edm {
   // -----------------------------
