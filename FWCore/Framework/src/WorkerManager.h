@@ -48,14 +48,14 @@ namespace edm {
 
     AllWorkers const& workers() const {return allWorkers_;}
 
+    void addToAllWorkers(Worker* w, bool useStopwatch);
+    
   private:
 
     void resetAll();
 
     void setupOnDemandSystem(EventPrincipal& principal, EventSetup const& es);
 
-    void addToAllWorkers(Worker* w, bool useStopwatch);
-    
     WorkerRegistry      workerReg_;
     ActionTable const*  actionTable_;
 

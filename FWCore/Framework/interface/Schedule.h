@@ -242,8 +242,6 @@ namespace edm {
     template <typename T>
     void runEndPaths(typename T::MyPrincipal&, EventSetup const&);
 
-    void setupOnDemandSystem(EventPrincipal& principal, EventSetup const& es);
-
     void reportSkipped(EventPrincipal const& ep) const;
     void reportSkipped(LuminosityBlockPrincipal const&) const {}
     void reportSkipped(RunPrincipal const&) const {}

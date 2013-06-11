@@ -1216,19 +1216,19 @@ namespace edm {
   }
 
   void Schedule::respondToOpenInputFile(FileBlock const& fb) {
-    for_all(all_workers_, boost::bind(&Worker::respondToOpenInputFile, _1, boost::cref(fb)));
+    for_all(allWorkers(), boost::bind(&Worker::respondToOpenInputFile, _1, boost::cref(fb)));
   }
 
   void Schedule::respondToCloseInputFile(FileBlock const& fb) {
-    for_all(all_workers_, boost::bind(&Worker::respondToCloseInputFile, _1, boost::cref(fb)));
+    for_all(allWorkers(), boost::bind(&Worker::respondToCloseInputFile, _1, boost::cref(fb)));
   }
 
   void Schedule::respondToOpenOutputFiles(FileBlock const& fb) {
-    for_all(all_workers_, boost::bind(&Worker::respondToOpenOutputFiles, _1, boost::cref(fb)));
+    for_all(allWorkers(), boost::bind(&Worker::respondToOpenOutputFiles, _1, boost::cref(fb)));
   }
 
   void Schedule::respondToCloseOutputFiles(FileBlock const& fb) {
-    for_all(all_workers_, boost::bind(&Worker::respondToCloseOutputFiles, _1, boost::cref(fb)));
+    for_all(allWorkers(), boost::bind(&Worker::respondToCloseOutputFiles, _1, boost::cref(fb)));
   }
 
   void Schedule::beginJob(ProductRegistry const& iRegistry) {
@@ -1236,23 +1236,22 @@ namespace edm {
   }
 
   void Schedule::preForkReleaseResources() {
-    for_all(all_workers_, boost::bind(&Worker::preForkReleaseResources, _1));
+    for_all(allWorkers(), boost::bind(&Worker::preForkReleaseResources, _1));
   }
   void Schedule::postForkReacquireResources(unsigned int iChildIndex, unsigned int iNumberOfChildren) {
-    for_all(all_workers_, boost::bind(&Worker::postForkReacquireResources, _1, iChildIndex, iNumberOfChildren));
+    for_all(allWorkers(), boost::bind(&Worker::postForkReacquireResources, _1, iChildIndex, iNumberOfChildren));
   }
 
   bool Schedule::changeModule(std::string const& iLabel,
                               ParameterSet const& iPSet) {
-    Worker* found = 0;
-    for (AllWorkers::const_iterator it=all_workers_.begin(), itEnd=all_workers_.end();
-        it != itEnd; ++it) {
-      if ((*it)->description().moduleLabel() == iLabel) {
-        found = *it;
+    Worker* found = nullptr;
+    for (auto const& worker : allWorkers()) {
+      if (worker->description().moduleLabel() == iLabel) {
+        found = worker;
         break;
       }
     }
-    if (0 == found) {
+    if (nullptr == found) {
       return false;
     }
 
@@ -1365,7 +1364,7 @@ namespace edm {
 
     fill_summary(trig_paths_,  rep.trigPathSummaries, &fillPathSummary);
     fill_summary(end_paths_,   rep.endPathSummaries,  &fillPathSummary);
-    fill_summary(all_workers_, rep.workerSummaries,   &fillWorkerSummary);
+    fill_summary(allWorkers(), rep.workerSummaries,   &fillWorkerSummary);
   }
 
   void
@@ -1373,7 +1372,7 @@ namespace edm {
     total_events_ = total_passed_ = 0;
     for_all(trig_paths_, boost::bind(&Path::clearCounters, _1));
     for_all(end_paths_, boost::bind(&Path::clearCounters, _1));
-    for_all(all_workers_, boost::bind(&Worker::clearCounters, _1));
+    for_all(allWorkers(), boost::bind(&Worker::clearCounters, _1));
   }
 
   void
@@ -1384,14 +1383,9 @@ namespace edm {
 
   void
   Schedule::addToAllWorkers(Worker* w) {
-    workerManager_.addToAllWorkers(wantSummary_);
+    workerManager_.addToAllWorkers(w, wantSummary_);
   }
 
-  void
-  Schedule::setupOnDemandSystem(EventPrincipal& ep, EventSetup const& es) {
-    workerManager_.setupOnDemandSystem(ep, es);
-  }
-  
   void 
   Schedule::resetEarlyDelete() {
     //must be sure we have cleared the count first
