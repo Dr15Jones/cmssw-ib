@@ -1,5 +1,5 @@
 // Last commit: $Id: AnalysisDescriptions.cc,v 1.13 2009/04/06 16:57:28 lowette Exp $
-// Latest tag:  $Name: V07-01-12 $
+// Latest tag:  $Name: V07-01-13 $
 // Location:    $Source: /local/reps/CMSSW/CMSSW/OnlineDB/SiStripConfigDb/src/AnalysisDescriptions.cc,v $
 
 #include "OnlineDB/SiStripConfigDb/interface/SiStripConfigDb.h"

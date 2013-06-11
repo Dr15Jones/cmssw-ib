@@ -8,7 +8,7 @@
 //
 // Original Author:  Gena Kukartsev, kukarzev@fnal.gov
 //         Created:  Tue Oct 23 14:30:20 CDT 2007
-// $Id: XMLHTRPatternLoader.cc,v 1.4 2010/08/06 20:24:13 wmtan Exp $
+// $Id: XMLHTRPatternLoader.cc,v 1.5 2013/05/23 15:17:36 gartung Exp $
 //
 
 // system include files
@@ -163,7 +163,7 @@ int XMLHTRPatternLoader::addChecksums( checksumsDBConfig * config, std::string t
   return 0;
 }
 
-int XMLHTRPatternLoader::createLoader( std::vector<int> crate_number, std::vector<std::string> file_name )
+int XMLHTRPatternLoader::createLoader( const std::vector<int>& crate_number, const std::vector<std::string>& file_name )
 {
   XMLHTRPatternLoader::datasetDBConfig conf;
 

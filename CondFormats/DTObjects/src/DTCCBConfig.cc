@@ -1,8 +1,8 @@
 /*
  *  See header file for a description of this class.
  *
- *  $Date: 2010/01/20 18:20:08 $
- *  $Revision: 1.9 $
+ *  $Date: 2013/05/23 15:59:44 $
+ *  $Revision: 1.10 $
  *  \author Paolo Ronchese INFN Padova
  *
  */
@@ -189,7 +189,7 @@ void DTCCBConfig::clear() {
 }
 
 
-void DTCCBConfig::setFullKey( std::vector<DTConfigKey> key ) {
+void DTCCBConfig::setFullKey( const std::vector<DTConfigKey>& key ) {
   fullConfigKey = key;
 }
 

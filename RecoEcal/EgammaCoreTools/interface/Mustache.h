@@ -10,20 +10,33 @@
 
 namespace reco {
   namespace MustacheKernel {    
-      bool inMustache(float maxEta, float maxPhi, 
-		      float ClustE, float ClusEta, float ClusPhi);
+      bool inMustache(const float maxEta, const float maxPhi, 
+		      const float ClustE, const float ClusEta, 
+		      const float ClusPhi);
+      bool inDynamicDPhiWindow(const bool isEE, const float seedPhi,
+			       const float ClustE, const float ClusEta,
+			       const float clusPhi);
      
   }
 
   class Mustache {
     
   public:
-    void MustacheID(CaloClusterPtrVector& clusters, int & nclusters, float & EoutsideMustache);
-    void MustacheID(std::vector<const CaloCluster*>&, int & nclusers,float & EoutsideMustache); 
-    void MustacheID(const reco::SuperCluster& sc, int & nclusters, float & EoutsideMustache);
-    void MustacheClust(std::vector<CaloCluster>& clusters, std::vector<unsigned int>& insideMust, std::vector<unsigned int>& outsideMust);
+    void MustacheID(const CaloClusterPtrVector& clusters, 
+		    int & nclusters, float & EoutsideMustache);
+    void MustacheID(const std::vector<const CaloCluster*>&, 
+		    int & nclusers,
+		    float & EoutsideMustache); 
+    void MustacheID(const reco::SuperCluster& sc, 
+		    int & nclusters, 
+		    float & EoutsideMustache);
+
+
+    void MustacheClust(const std::vector<CaloCluster>& clusters, 
+		       std::vector<unsigned int>& insideMust, 
+		       std::vector<unsigned int>& outsideMust);
     
-    void FillMustacheVar(std::vector<CaloCluster>& clusters);
+    void FillMustacheVar(const std::vector<CaloCluster>& clusters);
     //return Functions for Mustache Variables:
     float MustacheE(){return Energy_In_Mustache_;}
     float MustacheEOut(){return Energy_Outside_Mustache_;}
@@ -32,6 +45,12 @@ namespace reco {
     int InsideMust(){return included_;}
     int OutsideMust(){return excluded_;}
   private:
+    template<class RandomAccessPtrIterator>
+      void MustacheID(const RandomAccessPtrIterator&,
+		      const RandomAccessPtrIterator&,
+		      int& nclusters,
+		      float& EoutsideMustache);
+    
     float Energy_In_Mustache_;
     float Energy_Outside_Mustache_;
     float Et_Outside_Mustache_;

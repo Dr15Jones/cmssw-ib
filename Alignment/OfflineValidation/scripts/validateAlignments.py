@@ -203,10 +203,6 @@ class ValidationJob:
 def createOfflineJobsMergeScript(offlineValidationList, outFilePath):
     repMap = offlineValidationList[0].getRepMap() # bit ugly since some special features are filled
     repMap[ "mergeOfflinParJobsInstantiation" ] = "" #give it a "" at first in order to get the initialisation back
-
-    for validation in offlineValidationList:
-        repMap[ "mergeOfflinParJobsInstantiation" ] = validation.appendToMergeParJobs( repMap[ "mergeOfflinParJobsInstantiation" ] )
-#                    validationsSoFar = 'PlotAlignmentValidation p("%(resultFile)s", "%(name)s", %(color)s, %(style)s);\n'%repMap
     
     theFile = open( outFilePath, "w" )
     theFile.write( replaceByMap( configTemplates.mergeOfflineParJobsTemplate ,repMap ) )
@@ -297,13 +293,22 @@ def createParallelMergeScript( path, validations ):
         repMap["extendeValScriptPath"] = os.path.join(path, "TkAlExtendedOfflineValidation.C")
         createExtendedValidationScript( comparisonLists["OfflineValidationParallel"], repMap["extendeValScriptPath"] )
         repMap["mergeOfflineParJobsScriptPath"] = os.path.join(path, "TkAlOfflineJobsMerge.C")
-        createOfflineJobsMergeScript( comparisonLists["OfflineValidationParallel"], repMap["mergeOfflineParJobsScriptPath"] )
+        createOfflineJobsMergeScript( comparisonLists["OfflineValidationParallel"],
+                                      repMap["mergeOfflineParJobsScriptPath"] )
+
+        # introduced to merge individual validation outputs separately
+        #  -> avoids problems with merge script
+        repMap["haddLoop"] = ""
+        for validation in comparisonLists["OfflineValidationParallel"]:
+            repMap["haddLoop"] = validation.appendToMergeParJobs(repMap["haddLoop"])
+            repMap["haddLoop"] += ("cmsStage -f "
+                                   +validation.getRepMap()["outputFile"]
+                                   +" "
+                                   +validation.getRepMap()["resultFile"]
+                                   +"\n")
+
         repMap["RunExtendedOfflineValidation"] = \
             replaceByMap(configTemplates.extendedValidationExecution, repMap)
-
-        # needed to copy the right merged file back to eos
-        repMap["resultFile"] = comparisonLists["OfflineValidationParallel"][0].getRepMap()["resultFile"]
-        repMap["outputFile"] = comparisonLists["OfflineValidationParallel"][0].getRepMap()["outputFile"]
 
         # DownloadData is the section which merges output files from parallel jobs
         # it uses the file TkAlOfflineJobsMerge.C
@@ -361,6 +366,10 @@ def main(argv = None):
                          help="restrict validations to given modes (comma seperated) (default: no restriction)", metavar="RESTRICTTO")
     optParser.add_option("-s", "--status", dest="crabStatus", action="store_true", default = False,
                          help="get the status of the crab jobs", metavar="STATUS")
+    optParser.add_option("-d", "--debug", dest="debugMode", action="store_true",
+                         default = False,
+                         help="Run the tool to get full traceback of errors.",
+                         metavar="DEBUG")
 
     (options, args) = optParser.parse_args(argv)
 
@@ -483,5 +492,12 @@ def main(argv = None):
     
 
 if __name__ == "__main__":        
-   # main(["-n","-N","test","-c","defaultCRAFTValidation.ini,latestObjects.ini","--getImages"])
-   main()
+    # main(["-n","-N","test","-c","defaultCRAFTValidation.ini,latestObjects.ini","--getImages"])
+    if "-d" in sys.argv[1:] or "--debug" in sys.argv[1:]:
+        main()
+    else:
+        try:
+            main()
+        except AllInOneError, e:
+            print "\nAll-In-One Tool:", str(e)
+            exit(1)
