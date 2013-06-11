@@ -27,12 +27,13 @@ namespace edm {
 
     WorkerManager(boost::shared_ptr<ActivityRegistry> actReg, ActionTable const& actions);
 
-    void createWorker(ParameterSet& pset,
+    void addToUnscheduledWorkers(ParameterSet& pset,
                       ProductRegistry& preg,
                       boost::shared_ptr<ProcessConfiguration> processConfiguration,
                       std::string label,
                       bool useStopwatch,
-                      std::set<std::string>& unscheduledLabels);
+                      std::set<std::string>& unscheduledLabels,
+                      std::vector<std::string>& shouldBeUsedLabels);
 
     void setOnDemandProducts(ProductRegistry& pregistry, std::set<std::string> const& unscheduledLabels) const;
 
@@ -45,7 +46,7 @@ namespace edm {
     void endJob();
     void endJob(ExceptionCollector& collector);
 
-    AllWorkers const& workers() {return all_workers_;}
+    AllWorkers const& workers() const {return allWorkers_;}
 
   private:
 
@@ -55,10 +56,10 @@ namespace edm {
 
     void addToAllWorkers(Worker* w, bool useStopwatch);
     
-    WorkerRegistry      worker_reg_;
-    ActionTable const*  act_table_;
+    WorkerRegistry      workerReg_;
+    ActionTable const*  actionTable_;
 
-    AllWorkers          all_workers_;
+    AllWorkers          allWorkers_;
 
     boost::shared_ptr<UnscheduledCallProducer> unscheduled_;
   };
@@ -70,18 +71,18 @@ namespace edm {
                                  bool cleaningUpAfterException) {
     this->resetAll();
 
-
-    if (T::isEvent_) {
-      setupOnDemandSystem(dynamic_cast<EventPrincipal&>(ep), es);
-    }
     try {
       try {
         try {
-          //make sure the unscheduled items see this transition [Event will be a no-op]
-          unscheduled_->runNow<T>(ep, es);
+          if (T::isEvent_) {
+            setupOnDemandSystem(dynamic_cast<EventPrincipal&>(ep), es);
+          } else {
+            //make sure the unscheduled items see this run or lumi rtansition
+            unscheduled_->runNow<T>(ep, es);
+          }
         }
         catch(cms::Exception& e) {
-          actions::ActionCodes action = (T::isEvent_ ? act_table_->find(e.category()) : actions::Rethrow);
+          actions::ActionCodes action = (T::isEvent_ ? actionTable_->find(e.category()) : actions::Rethrow);
           assert (action != actions::IgnoreCompletely);
           assert (action != actions::FailPath);
           if (action == actions::SkipEvent) {

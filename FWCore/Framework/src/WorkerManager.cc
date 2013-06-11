@@ -10,28 +10,31 @@ namespace edm {
   // -----------------------------
 
   WorkerManager::WorkerManager(boost::shared_ptr<ActivityRegistry> areg, ActionTable const& actions) :
-    worker_reg_(areg),
-    act_table_(&actions),
-    all_workers_(),
+    workerReg_(areg),
+    actionTable_(&actions),
+    allWorkers_(),
     unscheduled_(new UnscheduledCallProducer) {
   } // WorkerManager::WorkerManager
 
-  void WorkerManager::createWorker(ParameterSet& pset,
+  void WorkerManager::addToUnscheduledWorkers(ParameterSet& pset,
                                    ProductRegistry& preg,
                                    boost::shared_ptr<ProcessConfiguration> processConfiguration,
                                    std::string label,
                                    bool useStopwatch,
-                                   std::set<std::string>& unscheduledLabels) {
+                                   std::set<std::string>& unscheduledLabels,
+                                   std::vector<std::string>& shouldBeUsedLabels) {
     //Need to
     // 1) create worker
     // 2) if it is a WorkerT<EDProducer>, add it to our list
-    WorkerParams params(&pset, preg, processConfiguration, *act_table_);
-    Worker* newWorker(worker_reg_.getWorker(params, label));
+    WorkerParams params(&pset, preg, processConfiguration, *actionTable_);
+    Worker* newWorker(workerReg_.getWorker(params, label));
     if(newWorker->moduleType() == Worker::kProducer || newWorker->moduleType() == Worker::kFilter) {
       unscheduledLabels.insert(label);
       unscheduled_->addWorker(newWorker);
       //add to list so it gets reset each new event
       addToAllWorkers(newWorker, useStopwatch);
+    } else {
+      shouldBeUsedLabels.push_back(label);
     }
   }
 
@@ -46,13 +49,13 @@ namespace edm {
   }
   
   void WorkerManager::endJob() {
-    for(auto& worker : all_workers_) {
+    for(auto& worker : allWorkers_) {
       worker->endJob();
     }
   }
 
   void WorkerManager::endJob(ExceptionCollector& collector) {
-    for(auto& worker : all_workers_) {
+    for(auto& worker : allWorkers_) {
       try {
         try {
           worker->endJob();
@@ -75,28 +78,28 @@ namespace edm {
     auto const runLookup = iRegistry.productLookup(InRun);
     auto const lumiLookup = iRegistry.productLookup(InLumi);
     auto const eventLookup = iRegistry.productLookup(InEvent);
-    for(auto& worker : all_workers_) {
+    for(auto& worker : allWorkers_) {
       worker->updateLookup(InRun,*runLookup);
       worker->updateLookup(InLumi,*lumiLookup);
       worker->updateLookup(InEvent,*eventLookup);
     }
     
-    for_all(all_workers_, boost::bind(&Worker::beginJob, _1));
+    for_all(allWorkers_, boost::bind(&Worker::beginJob, _1));
     loadMissingDictionaries();
   }
 
   void
   WorkerManager::resetAll() {
-    for_all(all_workers_, boost::bind(&Worker::reset, _1));
+    for_all(allWorkers_, boost::bind(&Worker::reset, _1));
   }
 
   void
   WorkerManager::addToAllWorkers(Worker* w, bool useStopwatch) {
-    if(!search_all(all_workers_, w)) {
+    if(!search_all(allWorkers_, w)) {
       if(useStopwatch) {
         w->useStopwatch();
       }
-      all_workers_.push_back(w);
+      allWorkers_.push_back(w);
     }
   }
 
