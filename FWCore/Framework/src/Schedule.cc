@@ -762,18 +762,17 @@ namespace edm {
                              PathWorkers& out,
                              vstring* labelsOnPaths) {
     vstring modnames = proc_pset.getParameter<vstring>(name);
-    vstring::iterator it(modnames.begin()), ie(modnames.end());
     PathWorkers tmpworkers;
 
-    for (; it != ie; ++it) {
+    for (auto const& name : modnames) {
 
-      if (labelsOnPaths) labelsOnPaths->push_back(*it);
+      if (labelsOnPaths) labelsOnPaths->push_back(name);
 
       WorkerInPath::FilterAction filterAction = WorkerInPath::Normal;
-      if ((*it)[0] == '!')       filterAction = WorkerInPath::Veto;
-      else if ((*it)[0] == '-')  filterAction = WorkerInPath::Ignore;
+      if (name[0] == '!')       filterAction = WorkerInPath::Veto;
+      else if (name[0] == '-')  filterAction = WorkerInPath::Ignore;
 
-      std::string moduleLabel = *it;
+      std::string moduleLabel = name;
       if (filterAction != WorkerInPath::Normal) moduleLabel.erase(0, 1);
 
       bool isTracked;
@@ -790,8 +789,7 @@ namespace edm {
       }
       assert(isTracked);
 
-      WorkerParams params(modpset, preg, processConfiguration, *act_table_);
-      Worker* worker = worker_reg_.getWorker(params, moduleLabel);
+      Worker* worker = workerManager_.getWorker(*modpset, preg, processConfiguration, moduleLabel);
       if (ignoreFilters && filterAction != WorkerInPath::Ignore && worker->moduleType()==Worker::kFilter) {
         // We have a filter on an end path, and the filter is not explicitly ignored.
         // See if the filter is allowed.
@@ -828,7 +826,7 @@ namespace edm {
 
     // an empty path will cause an extra bit that is not used
     if (!tmpworkers.empty()) {
-      Path p(bitpos, name, tmpworkers, trptr, *act_table_, actReg_, false);
+      Path p(bitpos, name, tmpworkers, trptr, actionTable(), actReg_, false);
       if (wantSummary_) {
         p.useStopwatch();
       }
@@ -850,7 +848,7 @@ namespace edm {
     }
 
     if (!tmpworkers.empty()) {
-      Path p(bitpos, name, tmpworkers, endpath_results_, *act_table_, actReg_, true);
+      Path p(bitpos, name, tmpworkers, endpath_results_, actionTable(), actReg_, true);
       if (wantSummary_) {
         p.useStopwatch();
       }

@@ -16,6 +16,14 @@ namespace edm {
     unscheduled_(new UnscheduledCallProducer) {
   } // WorkerManager::WorkerManager
 
+  Worker* WorkerManager::getWorker(ParameterSet& pset,
+                                   ProductRegistry& preg,
+                                   boost::shared_ptr<ProcessConfiguration const> processConfiguration,
+                                   std::string label) {
+    WorkerParams params(&pset, preg, processConfiguration, *actionTable_);
+    return workerReg_.getWorker(params, label);
+  }
+
   void WorkerManager::addToUnscheduledWorkers(ParameterSet& pset,
                                    ProductRegistry& preg,
                                    boost::shared_ptr<ProcessConfiguration> processConfiguration,
@@ -26,8 +34,7 @@ namespace edm {
     //Need to
     // 1) create worker
     // 2) if it is a WorkerT<EDProducer>, add it to our list
-    WorkerParams params(&pset, preg, processConfiguration, *actionTable_);
-    Worker* newWorker(workerReg_.getWorker(params, label));
+    Worker* newWorker = getWorker(pset, preg, processConfiguration, label);
     if(newWorker->moduleType() == Worker::kProducer || newWorker->moduleType() == Worker::kFilter) {
       unscheduledLabels.insert(label);
       unscheduled_->addWorker(newWorker);

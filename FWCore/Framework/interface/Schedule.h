@@ -229,7 +229,12 @@ namespace edm {
 
     /// returns the collection of pointers to workers
     AllWorkers const& allWorkers() const {
-      return workerManager_.workers();
+      return workerManager_.allWorkers();
+    }
+
+    /// returns the action table
+    ActionTable const& actionTable() const {
+      return workerManager_.actionTable();
     }
 
   private:
@@ -353,7 +358,7 @@ namespace edm {
     RunStopwatch stopwatch(T::isEvent_ ? stopwatch_ : RunStopwatch::StopwatchPointer());
 
     // This call takes care of the unscheduled processing.
-    workerManager_.processOneOccurrence(ep, es, cleaningUpAfterException);
+    workerManager_.processOneOccurrence<T>(ep, es, cleaningUpAfterException);
 
     if (T::isEvent_) {
       ++total_events_;
@@ -367,7 +372,7 @@ namespace edm {
           state_ = Latched;
         }
         catch(cms::Exception& e) {
-          actions::ActionCodes action; // TEMP  = (T::isEvent_ ? act_table_->find(e.category()) : actions::Rethrow);
+          actions::ActionCodes action = (T::isEvent_ ? actionTable().find(e.category()) : actions::Rethrow);
           assert (action != actions::IgnoreCompletely);
           assert (action != actions::FailPath);
           if (action == actions::SkipEvent) {

@@ -46,10 +46,17 @@ namespace edm {
     void endJob();
     void endJob(ExceptionCollector& collector);
 
-    AllWorkers const& workers() const {return allWorkers_;}
+    AllWorkers const& allWorkers() const {return allWorkers_;}
 
     void addToAllWorkers(Worker* w, bool useStopwatch);
-    
+
+    ActionTable const&  actionTable() const {return *actionTable_;}
+
+    Worker* getWorker(ParameterSet& pset,
+                      ProductRegistry& preg,
+                      boost::shared_ptr<ProcessConfiguration const> processConfiguration,
+                      std::string label);
+
   private:
 
     void resetAll();
