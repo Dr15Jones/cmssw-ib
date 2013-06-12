@@ -1,4 +1,4 @@
-#include "FWCore/Framework/src/WorkerManager.h"
+#include "FWCore/Framework/interface/WorkerManager.h"
 
 #include "DataFormats/Provenance/interface/ProductRegistry.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
