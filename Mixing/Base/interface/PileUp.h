@@ -31,7 +31,7 @@ namespace CLHEP {
 
 
 namespace edm {
-  class XXX;
+  class SecondaryEventProvider;
 
   class PileUp {
   public:
@@ -99,7 +99,7 @@ namespace edm {
     std::unique_ptr<EventPrincipal> eventPrincipal_;
     boost::shared_ptr<LuminosityBlockPrincipal> lumiPrincipal_;
     boost::shared_ptr<RunPrincipal> runPrincipal_;
-    std::unique_ptr<XXX> provider_;
+    std::unique_ptr<SecondaryEventProvider> provider_;
     std::unique_ptr<CLHEP::RandPoissonQ> poissonDistribution_;
     std::unique_ptr<CLHEP::RandPoisson>  poissonDistr_OOT_;
 
