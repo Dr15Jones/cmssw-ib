@@ -17,7 +17,7 @@
 
 #include "FWCore/Framework/interface/ESHandle.h"
 #include "FWCore/Framework/interface/EventSetup.h"
-#include "Mixing/Base/src/XXX.h"
+#include "Mixing/Base/src/SecondaryEventProvider.h"
 #include "CondFormats/DataRecord/interface/MixingRcd.h"
 #include "CondFormats/RunInfo/interface/MixingModuleConfig.h"
 
@@ -63,7 +63,7 @@ namespace edm {
 
     if(pset.existsAs<std::vector<ParameterSet> >("producers", true)) {
       std::vector<ParameterSet> producers = pset.getParameter<std::vector<ParameterSet> >("producers");
-      provider_.reset(new XXX(producers, *productRegistry_, ActionTable(), processConfiguration_));
+      provider_.reset(new SecondaryEventProvider(producers, *productRegistry_, ActionTable(), processConfiguration_));
     }
 
     input_->productRegistry()->setFrozen();
