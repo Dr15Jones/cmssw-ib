@@ -1,6 +1,7 @@
 #include "RecoEcal/EgammaCoreTools/interface/Mustache.h"
 #include "TMath.h"
 #include "TVector2.h"
+#include <cmath>
 using namespace std;
 
 namespace reco {  
@@ -12,17 +13,17 @@ namespace reco {
       //float eta0 = maxEta;
       //float phi0 = maxPhi;      
       
-      const float p00 = -0.107537;
-      const float p01 = 0.590969;
-      const float p02 = -0.076494;
-      const float p10 = -0.0268843;
-      const float p11 = 0.147742;
-      const float p12 = -0.0191235;
+      constexpr float p00 = -0.107537;
+      constexpr float p01 = 0.590969;
+      constexpr float p02 = -0.076494;
+      constexpr float p10 = -0.0268843;
+      constexpr float p11 = 0.147742;
+      constexpr float p12 = -0.0191235;
       
-      const float w00 = -0.00571429;
-      const float w01 = -0.002;
-      const float w10 = 0.0135714;
-      const float w11 = 0.001;
+      constexpr float w00 = -0.00571429;
+      constexpr float w01 = -0.002;
+      constexpr float w10 = 0.0135714;
+      constexpr float w11 = 0.001;
       
       const float sineta0 = std::sin(maxEta);
       const float eta0xsineta0 = maxEta*sineta0;
@@ -32,44 +33,75 @@ namespace reco {
       //of the form: y = a*x*x + b
       
       //b comes from a fit to the width
-      //and has a slight dependence on E on the upper edge
+      //and has a slight dependence on E on the upper edge    
+      // this only works because of fine tuning :-D
       const float sqrt_log10_clustE = std::sqrt(std::log10(ClustE)+1.1);
-      // rishi's original code
-      /*float b_upper= w10*eta0xsineta0 + w11 / sqrt_log10_clustE;      
-	float b_lower=w00*eta0xsineta0 + w01 / sqrt_log10_clustE;      
-      //here make an adjustment to the width for the offset from 0.
-      float midpoint=  b_upper - (b_upper-b_lower)/2.;
-      b_upper = b_upper - midpoint;
-      b_lower = b_lower - midpoint;
-      */
-      
-      // midpoint = (up + lo) / 2
-      // so b_upper = (up - lo) / 2
-      // and b_lower = (lo - up) / 2 = -b_upper
-
-      const float b_upper =  0.5*( eta0xsineta0*(w10 - w00) + 
-				   (w11-w01)/sqrt_log10_clustE );
+      // we need to have this in two steps, so that we don't improperly shift
+      // the lower bound!
+      float b_upper = w10*eta0xsineta0 + w11 / sqrt_log10_clustE;      
+      float b_lower = w00*eta0xsineta0 + w01 / sqrt_log10_clustE; 
+      const float midpoint =  0.5*( b_upper + b_lower );
+      b_upper -= midpoint;
+      b_lower -= midpoint;
 
       //the curvature comes from a parabolic 
       //fit for many slices in eta given a 
       //slice -0.1 < log10(Et) < 0.1
-      const float curv_up=eta0xsineta0*(p00*eta0xsineta0+p01)+p02;
-      const float curv_low=eta0xsineta0*(p10*eta0xsineta0+p11)+p12;
+      const float curv_up=std::max(eta0xsineta0*(p00*eta0xsineta0+p01)+p02,
+				   0.0f);
+      const float curv_low=std::max(eta0xsineta0*(p10*eta0xsineta0+p11)+p12,
+				    0.0f);
       
       //solving for the curviness given the width of this particular point
       const float a_upper=(1/(4*curv_up))-fabs(b_upper);
-      const float a_lower = (1/(4*curv_low))-fabs(b_upper);
+      const float a_lower = (1/(4*curv_low))-fabs(b_lower);
       
-      const float dphi=TVector2::Phi_mpi_pi(ClusPhi-maxPhi);
+      const double dphi=TVector2::Phi_mpi_pi(ClusPhi-maxPhi);
       const double dphi2 = dphi*dphi;
-      const float upper_cut=(1./(4.*a_upper))*dphi2+b_upper; 
-      const float lower_cut=(1./(4.*a_lower))*dphi2-b_upper;
+      // minimum offset is half a crystal width in either direction
+      // because science.
+      const float upper_cut=( std::max((1./(4.*a_upper)),0.0)*dphi2 +
+			      std::max(b_upper,0.0087f) );
+      const float lower_cut=( std::max((1./(4.*a_lower)),0.0)*dphi2 + 
+			      std::min(b_lower,-0.0087f) );
       
       //if(deta < upper_cut && deta > lower_cut) inMust=true;
       
-      const float deta=sineta0*(ClusEta-maxEta);
+      const float deta=(1-2*(maxEta<0))*(ClusEta-maxEta); // sign flip deta
       return (deta < upper_cut && deta > lower_cut);
-    }    
+    }
+
+    bool inDynamicDPhiWindow(const bool isEB, const float seedPhi,
+			     const float ClustE, const float ClusEta,
+			     const float ClusPhi) {
+      // from Rishi's fit 21 May 2013
+      constexpr double yoffsetEB = 0.04635;
+      constexpr double scaleEB   = 0.6514;
+      constexpr double xoffsetEB = 0.5709;
+      constexpr double widthEB   = 0.7814;
+
+      constexpr double yoffsetEE = 0.0453;
+      constexpr double scaleEE   = 0.7416;
+      constexpr double xoffsetEE = 0.09217;
+      constexpr double widthEE   = 1.059;
+      
+      double maxdphi;
+      
+      const double logClustEt = std::log(ClustE/std::cosh(ClusEta));
+      const double clusDphi = std::abs(TVector2::Phi_mpi_pi(seedPhi - 
+							    ClusPhi));
+      if( isEB ) {	
+	maxdphi = (yoffsetEB + scaleEB/(1+std::exp((logClustEt - 
+						    xoffsetEB)/widthEB)));
+      } else {
+	maxdphi = (yoffsetEE + scaleEE/(1+std::exp((logClustEt - 
+						    xoffsetEE)/widthEE)));
+      } 
+      maxdphi = ( logClustEt >  2.0 ) ? 0.15 : maxdphi;
+      maxdphi = ( logClustEt < -1.0 ) ? 0.6  : maxdphi;
+      
+      return clusDphi < maxdphi;
+    }
   }
   
   void Mustache::MustacheID(const reco::SuperCluster& sc, 

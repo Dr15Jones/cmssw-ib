@@ -1,7 +1,7 @@
 /** \file GlobalTrackingGeometryBuilder.cc
  * 
- *  $Date: 2011/08/16 14:54:34 $
- *  $Revision: 1.1 $
+ *  $Date: 2013/05/24 07:43:59 $
+ *  $Revision: 1.2 $
  *  \author Matteo Sani
  */
  
@@ -11,6 +11,7 @@
 #include <Geometry/TrackerGeometryBuilder/interface/TrackerGeometry.h>
 #include <Geometry/CSCGeometry/interface/CSCGeometry.h>
 #include <Geometry/RPCGeometry/interface/RPCGeometry.h>
+#include <Geometry/GEMGeometry/interface/GEMGeometry.h>
 #include <Geometry/DTGeometry/interface/DTGeometry.h>
 
 
@@ -24,7 +25,10 @@ GlobalTrackingGeometryBuilder::~GlobalTrackingGeometryBuilder(){}
 
 
 GlobalTrackingGeometry* GlobalTrackingGeometryBuilder::build(const TrackerGeometry* tk, 
-    const DTGeometry* dt, const CSCGeometry* csc, const RPCGeometry* rpc){
+							     const DTGeometry* dt, 
+							     const CSCGeometry* csc, 
+							     const RPCGeometry* rpc, 
+							     const GEMGeometry* gem){
 
     // DO NOT CHANGE THE ORDER OF THE GEOMETRIES !!!!!!!  
     
@@ -34,6 +38,7 @@ GlobalTrackingGeometry* GlobalTrackingGeometryBuilder::build(const TrackerGeomet
     tkGeometries.push_back(dt);
     tkGeometries.push_back(csc);
     tkGeometries.push_back(rpc);
+    tkGeometries.push_back(gem);
     
     
     return new GlobalTrackingGeometry(tkGeometries);

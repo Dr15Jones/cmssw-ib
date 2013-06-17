@@ -1,23 +1,28 @@
 /// \class SiStripLorentzAngleCalibration
 ///
-/// Calibration of Lorentz angle (and strip deco mode backplane corrections?)
-/// for the tracker, integrated in the alignment algorithms.
+/// Calibration of Lorentz angle for the strip tracker, integrated in the
+/// alignment algorithms. Note that not all algorithms support this...
 ///
-/// Note that not all algorithms support this...
+/// Use one instance for peak and/or one instance for deco mode data.
 ///
 ///  \author    : Gero Flucke
 ///  date       : August 2012
-///  $Revision: 1.6 $
-///  $Date: 2012/10/25 11:07:37 $
+///  $Revision: 1.7 $
+///  $Date: 2013/05/31 12:13:40 $
 ///  (last update by $Author: flucke $)
 
 #include "Alignment/CommonAlignmentAlgorithm/interface/IntegratedCalibrationBase.h"
+#include "Alignment/CommonAlignmentAlgorithm/interface/TkModuleGroupSelector.h"
+// include 'locally':
+#include "SiStripReadoutModeEnums.h"
+#include "TreeStruct.h"
 
 #include "CondCore/DBOutputService/interface/PoolDBOutputService.h"
 #include "CondFormats/DataRecord/interface/SiStripCondDataRecords.h"
 #include "CondFormats/SiStripObjects/interface/SiStripLatency.h"
 #include "CondFormats/SiStripObjects/interface/SiStripLorentzAngle.h"
-#include "CondFormats/SiStripObjects/interface/SiStripConfObject.h"
+//#include "CalibTracker/Records/interface/SiStripDependentRecords.h"
+#include "CondFormats/SiStripObjects/interface/SiStripBackPlaneCorrection.h"
 
 #include "DataFormats/DetId/interface/DetId.h"
 #include "DataFormats/SiStripDetId/interface/SiStripDetId.h"
@@ -26,6 +31,7 @@
 #include "FWCore/Framework/interface/ESWatcher.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
+#include "FWCore/ParameterSet/interface/ParameterSet.h"
 
 #include "Geometry/CommonDetUnit/interface/GeomDet.h"
 #include "MagneticField/Engine/interface/MagneticField.h"
@@ -37,10 +43,12 @@
 #include "TString.h"
 
 // #include <iostream>
+#include <boost/assign/list_of.hpp>
 #include <vector>
 #include <map>
 #include <sstream>
 #include <cstdio>
+#include <functional>
 
 class SiStripLorentzAngleCalibration : public IntegratedCalibrationBase
 {
@@ -71,7 +79,7 @@ public:
 				   const EventInfo &eventInfo) const;
 
   /// Setting the determined parameter identified by index,
-  /// should return false if out-of-bounds, true otherwise.
+  /// returns false if out-of-bounds, true otherwise.
   virtual bool setParameter(unsigned int index, double value);
 
   /// Setting the determined parameter uncertainty identified by index,
@@ -79,7 +87,7 @@ public:
   virtual bool setParameterError(unsigned int index, double error);
 
   /// Return current value of parameter identified by index.
-  /// Should return 0. if index out-of-bounds.
+  /// Returns 0. if index out-of-bounds.
   virtual double getParameter(unsigned int index) const;
 
   /// Return current value of parameter identified by index.
@@ -87,9 +95,10 @@ public:
   virtual double getParameterError(unsigned int index) const;
 
   // /// Call at beginning of job:
-  // virtual void beginOfJob(const AlignableTracker *tracker,
-  // 			  const AlignableMuon *muon,
-  // 			  const AlignableExtras *extras);
+  virtual void beginOfJob(AlignableTracker *tracker,
+  			  AlignableMuon *muon,
+  			  AlignableExtras *extras);
+  
 
   /// Called at end of a the job of the AlignmentProducer.
   /// Write out determined parameters.
@@ -105,23 +114,15 @@ private:
   const SiStripLorentzAngle* getLorentzAnglesInput();
   /// in non-peak mode the effective thickness is reduced...
   double effectiveThickness(const GeomDet *det, int16_t mode, const edm::EventSetup &setup) const;
-  /// take care that map of back plane fractions is properly filled
-  void checkBackPlaneFractionMap(const edm::EventSetup &setup);
 
   /// Determined parameter value for this detId (detId not treated => 0.)
   /// and the given run.
   double getParameterForDetId(unsigned int detId, edm::RunNumber_t run) const;
-  /// Index of parameter for given detId (detId not treated => < 0)
-  /// and the given run.
-  int getParameterIndexFromDetId(unsigned int detId, edm::RunNumber_t run) const;
-  /// Total number of IOVs.
-  unsigned int numIovs() const;
-  /// First run of iov (0 if iovNum not treated).
-  edm::RunNumber_t firstRunOfIOV(unsigned int iovNum) const;
 
-  void writeTree(const SiStripLorentzAngle *lorentzAngle, const char *treeName) const;
+  void writeTree(const SiStripLorentzAngle *lorentzAngle,
+		 const std::map<unsigned int,TreeStruct> &treeInfo, const char *treeName) const;
   SiStripLorentzAngle* createFromTree(const char *fileName, const char *treeName) const;
-
+  
   const std::string readoutModeName_;
   int16_t readoutMode_;
   const bool saveToDB_;
@@ -130,14 +131,14 @@ private:
   const std::vector<std::string> mergeFileNames_;
 
   edm::ESWatcher<SiStripLorentzAngleRcd> watchLorentzAngleRcd_;
-  edm::ESWatcher<SiStripConfObjectRcd>   watchBackPlaneRcd_;
 
-  // const AlignableTracker *alignableTracker_;
   SiStripLorentzAngle *siStripLorentzAngleInput_;
-  std::map<SiStripDetId::ModuleGeometry, double> backPlaneFractionMap_;
 
   std::vector<double> parameters_;
   std::vector<double> paramUncertainties_;
+
+  TkModuleGroupSelector *moduleGroupSelector_;
+  const edm::ParameterSet moduleGroupSelCfg_;
 };
 
 //======================================================================
@@ -151,41 +152,30 @@ SiStripLorentzAngleCalibration::SiStripLorentzAngleCalibration(const edm::Parame
     recordNameDBwrite_(cfg.getParameter<std::string>("recordNameDBwrite")),
     outFileName_(cfg.getParameter<std::string>("treeFile")),
     mergeFileNames_(cfg.getParameter<std::vector<std::string> >("mergeTreeFiles")),
-    //    alignableTracker_(0),
-    siStripLorentzAngleInput_(0)
+    siStripLorentzAngleInput_(0),
+    moduleGroupSelector_(0),
+    moduleGroupSelCfg_(cfg.getParameter<edm::ParameterSet>("LorentzAngleModuleGroups"))
 {
+
   // SiStripLatency::singleReadOutMode() returns
   // 1: all in peak, 0: all in deco, -1: mixed state
   // (in principle one could treat even mixed state APV by APV...)
   if (readoutModeName_ == "peak") {
-    readoutMode_ = 1;
+    readoutMode_ = kPeakMode;
   } else if (readoutModeName_ == "deconvolution") {
-    readoutMode_ = 0;
+    readoutMode_ = kDeconvolutionMode;
   } else {
     throw cms::Exception("BadConfig")
 	  << "SiStripLorentzAngleCalibration:\n" << "Unknown mode '" 
 	  << readoutModeName_ << "', should be 'peak' or 'deconvolution' .\n";
   }
 
-  // FIXME: Which granularity, leading to how many parameters?
-  parameters_.resize(2, 0.); // currently two parameters (TIB, TOB), start value 0.
-  paramUncertainties_.resize(2, 0.); // dito for errors
-
-  edm::LogInfo("Alignment") << "@SUB=SiStripLorentzAngleCalibration" << "Created with name "
-                            << this->name() << " for readout mode '" << readoutModeName_
-			    << "',\n" << this->numParameters() << " parameters to be determined."
-                            << "\nsaveToDB = " << saveToDB_
-                            << "\n outFileName = " << outFileName_
-                            << "\n N(merge files) = " << mergeFileNames_.size();
-  if (mergeFileNames_.size()) {
-    edm::LogInfo("Alignment") << "@SUB=SiStripLorentzAngleCalibration"
-                              << "First file to merge: " << mergeFileNames_[0];
-  }
 }
   
 //======================================================================
 SiStripLorentzAngleCalibration::~SiStripLorentzAngleCalibration()
 {
+  delete moduleGroupSelector_;
   //  std::cout << "Destroy SiStripLorentzAngleCalibration named " << this->name() << std::endl;
   delete siStripLorentzAngleInput_;
 }
@@ -213,11 +203,11 @@ SiStripLorentzAngleCalibration::derivatives(std::vector<ValuesIndexPair> &outDer
   edm::ESHandle<SiStripLatency> latency;  
   setup.get<SiStripLatencyRcd>().get(latency);
   const int16_t mode = latency->singleReadOutMode();
-  if(mode == readoutMode_) {
+  if (mode == readoutMode_) {
     if (hit.det()) { // otherwise 'constraint hit' or whatever
       
-      const int index = this->getParameterIndexFromDetId(hit.det()->geographicalId(),
-							 eventInfo.eventId_.run());
+      const int index = moduleGroupSelector_->getParameterIndexFromDetId(hit.det()->geographicalId(),
+                                                                    eventInfo.eventId_.run());
       if (index >= 0) { // otherwise not treated
         edm::ESHandle<MagneticField> magneticField;
         setup.get<IdealMagneticFieldRecord>().get(magneticField);
@@ -226,7 +216,14 @@ SiStripLorentzAngleCalibration::derivatives(std::vector<ValuesIndexPair> &outDer
         //std::cout << "SiStripLorentzAngleCalibration derivatives " << readoutModeName_ << std::endl;
         const double dZ = this->effectiveThickness(hit.det(), mode, setup);
         // shift due to LA: dx = tan(LA) * dz/2 = mobility * B_y * dz/2,
-        // '-' since we have derivative of the residual r = trk -hit
+        // '-' since we have derivative of the residual r = hit - trk and mu is part of trk model
+	//   (see GF's presentation in alignment meeting 25.10.2012,
+	//    https://indico.cern.ch/conferenceDisplay.py?confId=174266#2012-10-25)
+        // Hmm! StripCPE::fillParams() defines, together with 
+        //      StripCPE::driftDirection(...):
+        //      drift.x = -mobility * by * thickness (full drift from backside)
+        //      So '-' already comes from that, not from mobility being part of
+        //      track model...
         const double xDerivative = bFieldLocal.y() * dZ * -0.5; // parameter is mobility!
         if (xDerivative) { // If field is zero, this is zero: do not return it
           const Values derivs(xDerivative, 0.); // yDerivative = 0.
@@ -234,11 +231,12 @@ SiStripLorentzAngleCalibration::derivatives(std::vector<ValuesIndexPair> &outDer
         }
       }
     } else {
-      edm::LogWarning("Alignment") << "@SUB=SiStripLorentzAngleCalibration::derivatives2"
+      edm::LogWarning("Alignment") << "@SUB=SiStripLorentzAngleCalibration::derivatives1"
                                    << "Hit without GeomDet, skip!";
     }
-  } else if (mode != 0 && mode != 1) { // warn only if unknown/mixed mode  
-    edm::LogWarning("Alignment") << "@SUB=SiStripLorentzAngleCalibration::derivatives3"
+  } else if (mode != kDeconvolutionMode && mode != kPeakMode) {
+    // warn only if unknown/mixed mode  
+    edm::LogWarning("Alignment") << "@SUB=SiStripLorentzAngleCalibration::derivatives2"
                                  << "Readout mode is " << mode << ", but looking for "
                                  << readoutMode_ << " (" << readoutModeName_ << ").";
   }
@@ -271,32 +269,40 @@ bool SiStripLorentzAngleCalibration::setParameterError(unsigned int index, doubl
 //======================================================================
 double SiStripLorentzAngleCalibration::getParameter(unsigned int index) const
 {
-  //   if (index >= parameters_.size()) {
-  //     return 0.;
-  //   } else {
-  //     return parameters_[index];
-  //   }
   return (index >= parameters_.size() ? 0. : parameters_[index]);
 }
 
 //======================================================================
 double SiStripLorentzAngleCalibration::getParameterError(unsigned int index) const
 {
-  //   if (index >= paramUncertainties_.size()) {
-  //     return 0.;
-  //   } else {
-  //     return paramUncertainties_[index];
-  //   }
   return (index >= paramUncertainties_.size() ? 0. : paramUncertainties_[index]);
 }
 
-// //======================================================================
-// void SiStripLorentzAngleCalibration::beginOfJob(const AlignableTracker *tracker,
-//                                                 const AlignableMuon */*muon*/,
-//                                                 const AlignableExtras */*extras*/)
-// {
-//   alignableTracker_ = tracker;
-// }
+//======================================================================
+void SiStripLorentzAngleCalibration::beginOfJob(AlignableTracker *aliTracker,
+                                                AlignableMuon * /*aliMuon*/,
+                                                AlignableExtras * /*aliExtras*/)
+{
+  //specify the sub-detectors for which the LA is determined
+  const std::vector<int> sdets = boost::assign::list_of(SiStripDetId::TIB)(SiStripDetId::TOB); //no TEC,TID
+  moduleGroupSelector_ = new TkModuleGroupSelector(aliTracker, moduleGroupSelCfg_, sdets);
+ 
+  parameters_.resize(moduleGroupSelector_->getNumberOfParameters(), 0.);
+  paramUncertainties_.resize(moduleGroupSelector_->getNumberOfParameters(), 0.);
+
+  edm::LogInfo("Alignment") << "@SUB=SiStripLorentzAngleCalibration" << "Created with name "
+                            << this->name() << " for readout mode '" << readoutModeName_
+			    << "',\n" << this->numParameters() << " parameters to be determined."
+                            << "\nsaveToDB = " << saveToDB_
+                            << "\n outFileName = " << outFileName_
+                            << "\n N(merge files) = " << mergeFileNames_.size()
+                            << "\n number of IOVs = " << moduleGroupSelector_->numIovs();
+
+  if (mergeFileNames_.size()) {
+    edm::LogInfo("Alignment") << "@SUB=SiStripLorentzAngleCalibration"
+                              << "First file to merge: " << mergeFileNames_[0];
+  }
+}
 
 
 //======================================================================
@@ -310,10 +316,12 @@ void SiStripLorentzAngleCalibration::endOfJob()
   }
   edm::LogInfo("Alignment") << "@SUB=SiStripLorentzAngleCalibration::endOfJob" << out.str();
 
+  std::map<unsigned int, TreeStruct> treeInfo; // map of TreeStruct for each detId
+
   // now write 'input' tree
   const SiStripLorentzAngle *input = this->getLorentzAnglesInput(); // never NULL
   const std::string treeName(this->name() + '_' + readoutModeName_ + '_');
-  this->writeTree(input, (treeName + "input").c_str());
+  this->writeTree(input, treeInfo, (treeName + "input").c_str()); // empty treeInfo for input...
 
   if (input->getLorentzAngles().empty()) {
     edm::LogError("Alignment") << "@SUB=SiStripLorentzAngleCalibration::endOfJob"
@@ -322,21 +330,37 @@ void SiStripLorentzAngleCalibration::endOfJob()
     return;
   }
 
-  for (unsigned int iIOV = 0; iIOV < this->numIovs(); ++iIOV) {
-    cond::Time_t firstRunOfIOV = this->firstRunOfIOV(iIOV);
+  const unsigned int nonZeroParamsOrErrors =   // Any determined value?
+    count_if (parameters_.begin(), parameters_.end(), std::bind2nd(std::not_equal_to<double>(),0.))
+    + count_if(paramUncertainties_.begin(), paramUncertainties_.end(),
+               std::bind2nd(std::not_equal_to<double>(), 0.));
+
+  for (unsigned int iIOV = 0; iIOV < moduleGroupSelector_->numIovs(); ++iIOV) {
+    cond::Time_t firstRunOfIOV = moduleGroupSelector_->firstRunOfIOV(iIOV);
     SiStripLorentzAngle *output = new SiStripLorentzAngle;
     // Loop on map of values from input and add (possible) parameter results
     for (auto iterIdValue = input->getLorentzAngles().begin();
 	 iterIdValue != input->getLorentzAngles().end(); ++iterIdValue) {
       // type of (*iterIdValue) is pair<unsigned int, float>
       const unsigned int detId = iterIdValue->first; // key of map is DetId
-      // Nasty: putLorentzAngle(..) takes float by reference - not even const reference!
-      float value = iterIdValue->second + this->getParameterForDetId(detId, firstRunOfIOV);
-      output->putLorentzAngle(detId, value); // put result in output
+      // Some code one could use to miscalibrate wrt input:
+      // double param = 0.;
+      // const DetId id(detId);
+      // if (id.subdetId() == 3) { // TIB
+      //   param = (readoutMode_ == kPeakMode ? -0.003 : -0.002);
+      // } else if (id.subdetId() == 5) { // TOB
+      //   param = (readoutMode_ == kPeakMode ? 0.005 : 0.004);
+      // }
+      const double param = this->getParameterForDetId(detId, firstRunOfIOV);
+      // put result in output, i.e. sum of input and determined parameter:
+      output->putLorentzAngle(detId, iterIdValue->second + param);
+      const int paramIndex = moduleGroupSelector_->getParameterIndexFromDetId(detId,firstRunOfIOV);
+      treeInfo[detId] = TreeStruct(param, this->getParameterError(paramIndex), paramIndex);
     }
 
-    // Write this even for mille jobs?
-    this->writeTree(output, (treeName + Form("result_%lld", firstRunOfIOV)).c_str());
+    if (saveToDB_ || nonZeroParamsOrErrors != 0) { // Skip writing mille jobs...
+      this->writeTree(output, treeInfo, (treeName + Form("result_%lld", firstRunOfIOV)).c_str());
+    }
 
     if (saveToDB_) { // If requested, write out to DB 
       edm::Service<cond::service::PoolDBOutputService> dbService;
@@ -362,13 +386,16 @@ bool SiStripLorentzAngleCalibration::checkLorentzAngleInput(const edm::EventSetu
   if (!siStripLorentzAngleInput_) {
     setup.get<SiStripLorentzAngleRcd>().get(readoutModeName_, lorentzAngleHandle);
     siStripLorentzAngleInput_ = new SiStripLorentzAngle(*lorentzAngleHandle);
+    // FIXME: Should we call 'watchLorentzAngleRcd_.check(setup)' as well?
+    //        Otherwise could be that next check has to check via following 'else', though
+    //        no new IOV has started... (to be checked)
   } else {
     if (watchLorentzAngleRcd_.check(setup)) { // new IOV of input - but how to check peak vs deco?
       setup.get<SiStripLorentzAngleRcd>().get(readoutModeName_, lorentzAngleHandle);
       if (lorentzAngleHandle->getLorentzAngles() // but only bad if non-identical values
 	  != siStripLorentzAngleInput_->getLorentzAngles()) { // (comparing maps)
-	// FIXME: Could different maps have same content, but different order?
-	//        Or 'floating point comparison' problem?
+	// Maps are containers sorted by key, but comparison problems may arise from
+	// 'floating point comparison' problems (FIXME?)
 	throw cms::Exception("BadInput")
 	  << "SiStripLorentzAngleCalibration::checkLorentzAngleInput:\n"
 	  << "Content of SiStripLorentzAngle changed at run " << eventInfo.eventId_.run()
@@ -388,76 +415,24 @@ double SiStripLorentzAngleCalibration::effectiveThickness(const GeomDet *det,
 {
   if (!det) return 0.;
   double dZ = det->surface().bounds().thickness(); // it is a float only...
-
-  // readoutMode_ == 1: "peak", == 0: "deconvolution"
-  // FIXME: SiStripConfObject also stores values for peak?
-  if (mode != 1) { // local reco always applies except for peak
-    // cons_cast since method may initialise values
-    const_cast<SiStripLorentzAngleCalibration*>(this)->checkBackPlaneFractionMap(setup);
-    const SiStripDetId id(det->geographicalId());
-    auto iter = backPlaneFractionMap_.find(id.moduleGeometry());
-    if (iter != backPlaneFractionMap_.end()) {
-      //std::cout << "apply " << iter->second << " for subdet " << id.subDetector() 
-      //          << " with thickness " << dZ << std::endl;
-      dZ *= (1. - iter->second);
-    } else {
-      edm::LogError("Alignment") << "@SUB=SiStripLorentzAngleCalibration::effectiveThickness"
-                                 << "Unknown SiStrip module type " << id.moduleGeometry();
-    }
-  }
-
+  const SiStripDetId id(det->geographicalId());
+  edm::ESHandle<SiStripBackPlaneCorrection> backPlaneHandle;
+  // FIXME: which one? DepRcd->get(handle) or Rcd->get(readoutModeName_, handle)??
+  // setup.get<SiStripBackPlaneCorrectionDepRcd>().get(backPlaneHandle); // get correct mode
+  setup.get<SiStripBackPlaneCorrectionRcd>().get(readoutModeName_, backPlaneHandle);
+  const double bpCor = backPlaneHandle->getBackPlaneCorrection(id); // it's a float...
+  //  std::cout << "bpCor " << bpCor << " in subdet " << id.subdetId() << std::endl;
+  dZ *= (1. - bpCor);
+ 
   return dZ;
 } 
-
-//======================================================================
-void SiStripLorentzAngleCalibration::checkBackPlaneFractionMap(const edm::EventSetup &setup)
-{
-  // Filled and valid? => Just return!
-  // FIXME: Why called twice?? Should we better do
-  // if (!(backPlaneFractionMap_.empty() || watchBackPlaneRcd_.check(setup))) return;
-  if (!backPlaneFractionMap_.empty() && !watchBackPlaneRcd_.check(setup)) return;
-
-  // All module types, see StripCPE constructor:
-  std::vector<std::pair<std::string, SiStripDetId::ModuleGeometry> > nameTypes;
-  nameTypes.push_back(std::make_pair("IB1",SiStripDetId::IB1));
-  nameTypes.push_back(std::make_pair("IB2",SiStripDetId::IB2));
-  nameTypes.push_back(std::make_pair("OB1",SiStripDetId::OB1));
-  nameTypes.push_back(std::make_pair("OB2",SiStripDetId::OB2));
-  nameTypes.push_back(std::make_pair("W1A",SiStripDetId::W1A));
-  nameTypes.push_back(std::make_pair("W2A",SiStripDetId::W2A));
-  nameTypes.push_back(std::make_pair("W3A",SiStripDetId::W3A));
-  nameTypes.push_back(std::make_pair("W1B",SiStripDetId::W1B));
-  nameTypes.push_back(std::make_pair("W2B",SiStripDetId::W2B));
-  nameTypes.push_back(std::make_pair("W3B",SiStripDetId::W3B));
-  nameTypes.push_back(std::make_pair("W4" ,SiStripDetId::W4 ));
-  nameTypes.push_back(std::make_pair("W5" ,SiStripDetId::W5 ));
-  nameTypes.push_back(std::make_pair("W6" ,SiStripDetId::W6 ));
-  nameTypes.push_back(std::make_pair("W7" ,SiStripDetId::W7 ));
-
-  edm::ESHandle<SiStripConfObject> stripConfObj;
-  setup.get<SiStripConfObjectRcd>().get(stripConfObj);
-
-  backPlaneFractionMap_.clear(); // Just to be sure!
-  for (auto nameTypeIt = nameTypes.begin(); nameTypeIt != nameTypes.end(); ++nameTypeIt) {
-    // See StripCPE constructor:
-    const std::string modeS(readoutModeName_ == "peak" ? "Peak" : "Deco");
-    const std::string shiftS("shift_" + nameTypeIt->first + modeS);
-    if (stripConfObj->isParameter(shiftS)) {
-      backPlaneFractionMap_[nameTypeIt->second] = stripConfObj->get<double>(shiftS);
-      std::cout << "backPlaneFraction for " << nameTypeIt->first << ": " 
-                << backPlaneFractionMap_[nameTypeIt->second] << std::endl;
-    } else {
-      std::cout << "No " << shiftS << " in SiStripConfObject!?!";
-    }
-  }
-}
 
 //======================================================================
 const SiStripLorentzAngle* SiStripLorentzAngleCalibration::getLorentzAnglesInput()
 {
   // For parallel processing in Millepede II, create SiStripLorentzAngle
   // from info stored in files of parallel jobs and check that they are identical.
-  // If this job has run on data, still check that LA is identical to the ones
+  // If this job has run on events, still check that LA is identical to the ones
   // from mergeFileNames_.
   const std::string treeName(((this->name() + '_') += readoutModeName_) += "_input");
   for (auto iFile = mergeFileNames_.begin(); iFile != mergeFileNames_.end(); ++iFile) {
@@ -497,47 +472,14 @@ const SiStripLorentzAngle* SiStripLorentzAngleCalibration::getLorentzAnglesInput
 double SiStripLorentzAngleCalibration::getParameterForDetId(unsigned int detId,
 							    edm::RunNumber_t run) const
 {
-  const int index = this->getParameterIndexFromDetId(detId, run);
+  const int index = moduleGroupSelector_->getParameterIndexFromDetId(detId, run);
 
   return (index < 0 ? 0. : parameters_[index]);
 }
 
 //======================================================================
-int SiStripLorentzAngleCalibration::getParameterIndexFromDetId(unsigned int detId,
-							       edm::RunNumber_t run) const
-{
-  // Return the index of the parameter that is used for this DetId.
-  // If this DetId is not treated, return values < 0.
-  
-  // FIXME: Extend to configurable granularity? 
-  //        Including treatment of run dependence?
-  const SiStripDetId id(detId);
-  if (id.det() == DetId::Tracker) {
-    if      (id.subDetector() == SiStripDetId::TIB) return 0;
-    else if (id.subDetector() == SiStripDetId::TOB) return 1;
-  }
-
-  return -1;
-}
-
-//======================================================================
-unsigned int SiStripLorentzAngleCalibration::numIovs() const
-{
-  // FIXME: Needed to include treatment of run dependence!
-  return 1; 
-}
-
-//======================================================================
-edm::RunNumber_t SiStripLorentzAngleCalibration::firstRunOfIOV(unsigned int iovNum) const
-{
-  // FIXME: Needed to include treatment of run dependence!
-  if (iovNum < this->numIovs()) return 1;
-  else return 0;
-}
-
-
-//======================================================================
 void SiStripLorentzAngleCalibration::writeTree(const SiStripLorentzAngle *lorentzAngle,
+					       const std::map<unsigned int, TreeStruct> &treeInfo,
 					       const char *treeName) const
 {
   if (!lorentzAngle) return;
@@ -552,19 +494,29 @@ void SiStripLorentzAngleCalibration::writeTree(const SiStripLorentzAngle *lorent
   TTree *tree = new TTree(treeName, treeName);
   unsigned int id = 0;
   float value = 0.;
+  TreeStruct treeStruct;
   tree->Branch("detId", &id, "detId/i");
   tree->Branch("value", &value, "value/F");
+  tree->Branch("treeStruct", &treeStruct, TreeStruct::LeafList());
 
   for (auto iterIdValue = lorentzAngle->getLorentzAngles().begin();
        iterIdValue != lorentzAngle->getLorentzAngles().end(); ++iterIdValue) {
     // type of (*iterIdValue) is pair<unsigned int, float>
     id = iterIdValue->first; // key of map is DetId
     value = iterIdValue->second;
+    // type of (*treeStructIter) is pair<unsigned int, TreeStruct>
+    auto treeStructIter = treeInfo.find(id); // find info for this id
+    if (treeStructIter != treeInfo.end()) {
+      treeStruct = treeStructIter->second; // info from input map
+    } else { // if none found, fill at least parameter index (using 1st IOV...)
+      const cond::Time_t run1of1stIov = moduleGroupSelector_->firstRunOfIOV(0);
+      const int ind = moduleGroupSelector_->getParameterIndexFromDetId(id, run1of1stIov);
+      treeStruct = TreeStruct(ind);
+    }
     tree->Fill();
   }
   tree->Write();
-  delete file; // tree vanishes with the file... (?)
-
+  delete file; // tree vanishes with the file...
 }
 
 //======================================================================

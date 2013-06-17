@@ -34,7 +34,7 @@
 #
 >Developers
 salerno : Roberto Salerno : Roberto.Salerno@cern.ch
-mwlebour : Matthew Wade Lebourgeois : mlebourgeois@physics.ucsd.edu
+#mwlebour : Matthew Wade Lebourgeois : mlebourgeois@physics.ucsd.edu
 sharper  : Sam James Harper :  s.j.harper@rl.ac.uk
 beaudett : Florian Beaudett : Florian.Beaudette@cern.ch
 
@@ -42,4 +42,5 @@ beaudett : Florian Beaudett : Florian.Beaudette@cern.ch
 salerno : Roberto Salerno : Roberto.Salerno@cern.ch
 mmozer : Matthias Mozer : Matthias.U.Mozer@cern.ch
 chamont: David Chamont : chamont@llr.in2p3.fr
+gmusat: Gabriel Musat : musat@llr.in2p3.fr
 sani : Matteo Sani : matteo.sani@cern.ch

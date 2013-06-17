@@ -24,14 +24,15 @@
 # of developers to include in the list.
 #
 >Developers
-vciulli : Vitaliano Ciulli : Vitaliano.Ciulli@cern.ch
-genta : Chiara Genta : Chiara.Genta@cern.ch
-sfrosali : Simone Frosali : Simone.Frosali@cern.ch 
+nurnberg : Andrea Nurnberg : andreas.nurnberg@cern.ch
+ghammad : Gregory Hammad : gregory.habib.hammad@cern.ch
+caebergs : Thierry Caeberg : thierry.caebergs@cern.ch
 
 >Administrators
 vciulli : Vitaliano Ciulli : Vitaliano.Ciulli@cern.ch
 genta : Chiara Genta : Chiara.Genta@cern.ch
-sfrosali : Simone Frosali : Simone.Frosali@cern.ch 
+#sfrosali : Simone Frosali : Simone.Frosali@cern.ch 
 pierro   : Antonio Pierro : antonio.pierro@ba.infn.it
 bbetchar : Burton Betchar : bbetchar@pas.rochester.edu
 querten : Loic Quertenmont : Loic.Quertenmont@cern.ch
+gbenelli: Gabriele Benelli : Gabriele.Benelli@cern.ch

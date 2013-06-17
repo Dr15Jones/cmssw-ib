@@ -1,7 +1,7 @@
 #ifndef PLOTMILLEPEDEIOV_H
 #define PLOTMILLEPEDEIOV_H
 // Original Author: Gero Flucke
-// last change    : $Date: 2012/06/25 13:21:53 $
+// last change    : $Date: 2013/03/07 11:30:08 $
 // by             : $Author: flucke $
 //
 // PlotMillePedeIOV is a class to plot the IOV dependence of pede parameters
@@ -59,6 +59,8 @@ class PlotMillePedeIOV
   //  void SetTitle(const char *title) {fTitle = title;}
   //  const TString& GetTitle() const { return fTitle;}
   GFHistManager* GetHistManager() { return fHistManager;}
+  PlotMillePede* GetPlotMillePede(unsigned int i) { return (i < fIovs.size() ? fIovs[i] : 0);}
+
 
   TString Unique(const char *name) const;
   Int_t PrepareAdd(bool addPlots);
