@@ -275,9 +275,9 @@ namespace edm {
         << "The last module on the stack shown above requested data from the\n"
         << "module with label: '" << moduleLabel << "'.\n"
         << "This is illegal because this module is already running (it is in the\n"
-        << "stack shown above, it might or might not be asking for data from itself)\n"
+        << "stack shown above, it might or might not be asking for data from itself).\n"
         << "More information related to resolving circular dependences can be found here:\n"
-        << "https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideUnscheduledExecution#Circular_Dependence_Errors";
+        << "https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideUnscheduledExecution#Circular_Dependence_Errors.";
     }
 
     moduleLabelsRunning_.push_back(moduleLabel);
